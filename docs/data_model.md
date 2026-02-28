@@ -2,6 +2,23 @@
 
 This document defines the core relational schema for P(l)otHole, including geospatial storage, integrity constraints, and relationship design for hazard reporting, voting, and gamification.
 
+## Read Order for Mixed-Skill Teams
+
+- **Beginner:** read "Design Principles", then skim `hazards` and `users` tables.
+- **Intermediate:** add `votes` and `reports`, then study indexes.
+- **Advanced:** review enum design, integrity constraints, and query patterns.
+
+## MVP Schema for Hackathons
+
+If you need to cut scope, implement these first:
+
+1. `users`
+2. `hazards` (with PostGIS point + core indexes)
+3. `votes`
+4. `reports`
+
+Then add `comments`, `badges`, and `user_badges` as time permits.
+
 ## Design Principles
 
 - Keep public hazard data highly queryable and export-friendly.

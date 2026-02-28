@@ -2,6 +2,21 @@
 
 P(l)otHole uses gamification to reward useful civic contributions while keeping incentives aligned with data quality and public accountability. This document defines the point economy, badge framework, leaderboard logic, and social-pressure indicators used across the platform.
 
+## Practical Hackathon Scope
+
+For a weekend build, ship gamification in this order:
+
+1. Base reputation events (`report`, `vote`, `accepted_name`)
+2. One badge family (Spotter)
+3. Simple weekly leaderboard
+4. Optional social share card
+
+## Skill-Level Contribution Guide
+
+- **Beginner:** verify point events manually and test edge cases.
+- **Intermediate:** implement event handlers, badge thresholds, and profile display.
+- **Advanced:** tune anti-abuse safeguards, ranking formulas, and scheduled jobs.
+
 ## Design Principles
 
 - Reward high-signal behavior (accurate reports, meaningful verification, constructive moderation).

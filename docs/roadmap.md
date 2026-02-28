@@ -2,6 +2,26 @@
 
 P(l)otHole is developed in five sequential phases, each building on the infrastructure, community, and data gravity established by the preceding phase. Every phase defines concrete deliverables, measurable milestones, and success criteria that gate progression to the next stage.
 
+## Hackathon Interpretation Guide
+
+This roadmap is long-term. For hackathon teams, treat it as:
+
+- **Now (demo):** Phase 1 core loop + one Phase 2 engagement feature.
+- **Next (post-hackathon):** complete remaining Phase 2 and harden quality checks.
+- **Later (scale):** move into full Phase 3+ integrations and funding/governance depth.
+
+### Current Delivery Timeline
+
+- **Development window:** 2-week implementation sprint.
+- **Build day:** March 19 (coached integration, QA, and demo readiness).
+- **Post-event path:** transition immediately into an open-source community project for PhilaConValley contributors.
+
+## Suggested Team Milestone Ownership
+
+- **Beginners:** QA scripts, docs, walkthroughs, and demo narration.
+- **Intermediate:** UI workflows, endpoint integration, and profile/leaderboard views.
+- **Advanced:** geospatial performance, caching, schema quality, and deployment reliability.
+
 ---
 
 ## Phase 1 -- MVP Reporting Platform

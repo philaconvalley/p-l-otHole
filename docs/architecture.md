@@ -2,6 +2,19 @@
 
 P(l)otHole is designed as a modular civic platform that prioritizes geospatial performance, public transparency, and straightforward deployment. This document describes the service boundaries, request flows, and scaling strategy for the initial and mid-term phases.
 
+## How to Read This (By Experience Level)
+
+- **Beginner:** focus on "High-Level Layered Design" and "Hazard Request Flow".
+- **Intermediate:** add "Caching Strategy" and "Deployment Topology".
+- **Advanced:** dive into "Geospatial Pipeline" and "Scalability and Reliability Notes".
+
+## Hackathon Team Split
+
+- **Frontend pair:** map UI, report form, hazard detail page, and status widgets.
+- **API pair:** endpoint contracts, validation, auth checks, and response envelopes.
+- **Data pair:** PostGIS schema, indexes, seed data, and query performance.
+- **Ops/QA pair:** environment setup, basic observability, and demo reliability checks.
+
 ## System Goals
 
 - Keep hazard reporting and map browsing fast at city scale.

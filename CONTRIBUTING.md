@@ -2,6 +2,22 @@
 
 Thanks for helping improve P(l)otHole. We welcome bug reports, feature ideas, docs edits, design feedback, and code contributions.
 
+## Hackathon-Friendly Contribution Paths
+
+Choose a lane that matches your experience level:
+
+- **Beginner path:** docs edits, issue triage, repro steps, API example testing, QA checklists.
+- **Intermediate path:** UI features, form validation, loading/error states, endpoint wiring.
+- **Advanced path:** PostGIS queries, cache strategy, auth/permissions, CI/release automation.
+
+For short hackathons, prefer small PRs that can be reviewed quickly.
+
+## Event Timeline and Community Transition
+
+- **Dev sprint:** 2 weeks of focused implementation.
+- **Build day:** March 19, with live coaching and integration support.
+- **After March 19:** project remains open source for ongoing PhilaConValley community contributions.
+
 ## Code of Conduct
 
 This project follows a community-first standard of respect, inclusion, and constructive collaboration.
@@ -30,6 +46,7 @@ If you experience or witness harmful behavior, open a private maintainer contact
 - Keep PRs focused and reasonably small.
 - Link the related issue in the PR description (for example: `Closes #123`).
 - Include screenshots or API samples when behavior changes.
+- If you are new, open a "draft PR" early to get guidance sooner.
 
 ## Branch Naming Convention
 
@@ -135,5 +152,12 @@ If a check cannot run in your environment, note that clearly in the PR with deta
 ## First-Time Contributors
 
 If you are new to open source, look for `good first issue` labels. Small docs fixes, test additions, and bug reproductions are great first contributions.
+
+### Suggested First PRs During Hackathon
+
+- Clarify one confusing setup step in `README.md`.
+- Add one request/response example in `docs/api.md`.
+- Add one small test case for validation or status transitions.
+- Improve one governance or moderation policy example with clearer wording.
 
 Thanks again for improving civic accountability with P(l)otHole.

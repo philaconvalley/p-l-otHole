@@ -2,6 +2,21 @@
 
 P(l)otHole is a civic accountability platform, so governance is a product feature, not an afterthought. This document defines how content is moderated, how decisions are made visible, and how community oversight protects trust over time.
 
+## Minimum Governance for Hackathons
+
+Even for demos, include these baseline protections:
+
+- profanity/abuse blocklist on hazard names
+- community flagging for comments and reports
+- moderator role with basic content removal reason
+- simple public moderation log (even if read-only JSON)
+
+## Team Guidance by Experience
+
+- **Beginner:** document policies clearly and test reporting/flagging flows.
+- **Intermediate:** wire moderation endpoints and UI state transitions.
+- **Advanced:** implement audit logs, appeals workflow, and anti-brigading controls.
+
 ## Governance Principles
 
 - **Public interest first:** policies exist to improve road safety outcomes, not to optimize engagement at all costs.

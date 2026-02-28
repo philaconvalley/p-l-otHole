@@ -6,6 +6,35 @@ P(l)otHole is a community-driven civic platform that empowers residents to repor
 
 ---
 
+## Sprint and Build Day Plan (Mixed-Skill Teams)
+
+If your team has a mix of beginners, product/design contributors, and experienced engineers, use this path first.
+
+### Who Can Contribute on Day 1
+
+- **Beginner-friendly:** write issue reports, test UX flows, improve docs, create seed data, and validate API examples with Postman/cURL.
+- **Intermediate:** build UI routes, connect forms to API endpoints, add validation and loading/error states.
+- **Advanced:** implement geospatial queries, caching, auth hardening, and deployment/CI setup.
+
+### 2-Week Development Sprint + Build Day
+
+1. **Week 1:** align scope, ship report -> map -> detail flow, and validate one full end-to-end report.
+2. **Week 2:** add voting, exports, moderation basics, and demo polish.
+3. **Build Day (March 19):** guided coaching day for integration, testing, and presentation readiness.
+
+### After Build Day: Open Source Handoff
+
+P(l)otHole continues as an open-source civic project stewarded with and for the **PhilaConValley community**. The March 19 build day is the launch point, not the finish line.
+
+### Fast Demo Scope (Recommended)
+
+- Create a hazard report with image + map pin.
+- Show hazards on map with at least one filter.
+- Display days-open + repair status on detail page.
+- Export current data as GeoJSON or CSV.
+
+---
+
 ## The Problem
 
 Road hazards cost drivers billions in vehicle damage every year, cause accidents, and disproportionately affect under-served communities with the least political leverage. Existing 311 systems bury reports in opaque queues. There is no public accountability, no transparency into timelines, and no collective pressure mechanism.
@@ -120,6 +149,21 @@ All hazard data collected by P(l)otHole is **public by default**. We believe civ
 
 ## Getting Started
 
+New team? Start with **Quick Setup** first, then use `CONTRIBUTING.md` for role-based tasks.
+
+### Fork + Clone (First-Time Contributors)
+
+If you plan to contribute code, fork the repo first, then clone your fork:
+
+```bash
+# 1) Fork this repository on GitHub
+# 2) Clone your fork locally
+git clone https://github.com/<your-username>/p-l-otHole.git
+cd p-l-otHole
+```
+
+If you are a core team member with direct write access, you can clone the main repository directly instead.
+
 ### Prerequisites
 
 - **Node.js** >= 18
@@ -152,6 +196,14 @@ pnpm dev
 ```
 
 The app will be available at `http://localhost:3000`. The API runs on `http://localhost:3000/api` (Next.js API routes) or `http://localhost:4000` if using a standalone Express server.
+
+### Quick Setup Checklist (First 30 Minutes)
+
+- [ ] Run the app locally and open the home page.
+- [ ] Create one sample hazard record (real or seeded).
+- [ ] Confirm it appears on map and detail page.
+- [ ] Verify one API call from `docs/api.md` using cURL or Postman.
+- [ ] Assign teammates to roles (UI, API, Data, QA/Docs, Demo).
 
 ### Environment Variables
 

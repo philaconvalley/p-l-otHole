@@ -2,6 +2,22 @@
 
 This document describes the public REST API for P(l)otHole. The API supports hazard reporting and discovery, community voting, user profile and leaderboard access, and open data exports.
 
+## Start Here (Hackathon Path)
+
+If your team is short on time, implement and test these endpoints first:
+
+1. `POST /hazards`
+2. `GET /hazards`
+3. `GET /hazards/{id}`
+4. `POST /hazards/{id}/vote`
+5. `GET /exports/geojson` or `GET /exports/csv`
+
+### Skill-Level Guidance
+
+- **Beginner:** run example cURL requests, verify status codes, and report contract mismatches.
+- **Intermediate:** implement request validation and pagination behavior.
+- **Advanced:** optimize radius search and add rate-limiting/auth middleware.
+
 ## Base URL and Versioning
 
 - **Production base URL:** `https://api.plothole.org/v1`
