@@ -1,0 +1,220 @@
+// P(l)otHole - Prisma Schema
+// PostgreSQL 15+ with PostGIS extension
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [postgis, pgcrypto]
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum HazardType {
+  pothole
+  crack
+  sinkhole
+  drainage
+  debris
+}
+
+enum RepairStatus {
+  reported
+  acknowledged
+  scheduled
+  in_progress
+  resolved
+  disputed
+}
+
+enum ReportStatus {
+  pending
+  verified
+  rejected
+}
+
+enum VoteTargetType {
+  hazard
+  name_proposal
+}
+
+// =============================================================================
+// MODELS
+// =============================================================================
+
+/// Application user identity and contribution profile
+model User {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username         String    @unique @db.VarChar(40)
+  email            String    @unique
+  passwordHash     String?   @map("password_hash")
+  reputationScore  Int       @default(0) @map("reputation_score")
+  reportsSubmitted Int       @default(0) @map("reports_submitted")
+  votesCast        Int       @default(0) @map("votes_cast")
+  badges           Json      @default("[]") @db.JsonB
+  isModerator      Boolean   @default(false) @map("is_moderator")
+  isBanned         Boolean   @default(false) @map("is_banned")
+  lastActiveAt     DateTime? @map("last_active_at") @db.Timestamptz
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  hazards          Hazard[]    @relation("HazardCreator")
+  reports          Report[]    @relation("ReportReporter")
+  votes            Vote[]
+  comments         Comment[]
+  earnedBadges     UserBadge[] @relation("BadgeEarner")
+  awardedBadges    UserBadge[] @relation("BadgeAwarder")
+
+  @@index([reputationScore(sort: Desc)], name: "users_reputation_idx")
+  @@map("users")
+}
+
+/// Canonical record for each map-visible road hazard
+model Hazard {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String?      @db.VarChar(120)
+  slug            String?      @unique @db.VarChar(140)
+  description     String?
+  type            HazardType
+  // PostGIS geography stored via raw SQL; lat/lng for Prisma queries
+  latitude        Decimal      @db.Decimal(9, 6)
+  longitude       Decimal      @db.Decimal(9, 6)
+  location        Unsupported("geography(POINT, 4326)")?
+  images          Json         @default("[]") @db.JsonB
+  severityScore   Int          @default(0) @map("severity_score")
+  upvotes         Int          @default(0)
+  downvotes       Int          @default(0)
+  reportsCount    Int          @default(1) @map("reports_count")
+  repairStatus    RepairStatus @default(reported) @map("repair_status")
+  cityTicketId    String?      @map("city_ticket_id") @db.VarChar(80)
+  cityCode        String       @map("city_code") @db.VarChar(32)
+  createdByUserId String?      @map("created_by_user_id") @db.Uuid
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  resolvedAt      DateTime?    @map("resolved_at") @db.Timestamptz
+  deletedAt       DateTime?    @map("deleted_at") @db.Timestamptz
+
+  // Relations
+  createdBy       User?        @relation("HazardCreator", fields: [createdByUserId], references: [id])
+  reports         Report[]
+  votes           Vote[]
+  comments        Comment[]
+
+  @@index([repairStatus, createdAt(sort: Desc)], name: "hazards_status_created_idx")
+  @@index([cityCode], name: "hazards_city_idx")
+  @@map("hazards")
+}
+
+/// Individual vote events used to compute hazard severity and ranking
+model Vote {
+  id         String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String         @map("user_id") @db.Uuid
+  hazardId   String?        @map("hazard_id") @db.Uuid
+  targetType VoteTargetType @default(hazard) @map("target_type")
+  value      Int            @db.SmallInt
+  note       String?        @db.VarChar(280)
+  createdAt  DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  user       User           @relation(fields: [userId], references: [id])
+  hazard     Hazard?        @relation(fields: [hazardId], references: [id])
+
+  @@unique([userId, hazardId], name: "votes_user_hazard_unique")
+  @@index([hazardId, createdAt(sort: Desc)], name: "votes_hazard_idx")
+  @@index([userId, createdAt(sort: Desc)], name: "votes_user_idx")
+  @@map("votes")
+}
+
+/// Report submissions that either create a new hazard or reinforce an existing one
+model Report {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  hazardId            String       @map("hazard_id") @db.Uuid
+  reporterUserId      String?      @map("reporter_user_id") @db.Uuid
+  description         String
+  imageUrls           Json         @default("[]") @map("image_urls") @db.JsonB
+  sourceLatitude      Decimal?     @map("source_latitude") @db.Decimal(9, 6)
+  sourceLongitude     Decimal?     @map("source_longitude") @db.Decimal(9, 6)
+  status              ReportStatus @default(pending)
+  verificationScore   Int          @default(0) @map("verification_score")
+  duplicateOfReportId String?      @map("duplicate_of_report_id") @db.Uuid
+  createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  verifiedAt          DateTime?    @map("verified_at") @db.Timestamptz
+
+  // Relations
+  hazard              Hazard       @relation(fields: [hazardId], references: [id])
+  reporter            User?        @relation("ReportReporter", fields: [reporterUserId], references: [id])
+  duplicateOf         Report?      @relation("ReportDuplicates", fields: [duplicateOfReportId], references: [id])
+  duplicates          Report[]     @relation("ReportDuplicates")
+
+  @@index([hazardId, createdAt(sort: Desc)], name: "reports_hazard_idx")
+  @@index([status, createdAt(sort: Desc)], name: "reports_status_idx")
+  @@index([reporterUserId, createdAt(sort: Desc)], name: "reports_reporter_idx")
+  @@map("reports")
+}
+
+/// Threaded community discussion on hazard records
+model Comment {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  hazardId        String    @map("hazard_id") @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  parentCommentId String?   @map("parent_comment_id") @db.Uuid
+  body            String
+  isFlagged       Boolean   @default(false) @map("is_flagged")
+  isDeleted       Boolean   @default(false) @map("is_deleted")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  hazard          Hazard    @relation(fields: [hazardId], references: [id])
+  user            User      @relation(fields: [userId], references: [id])
+  parent          Comment?  @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies         Comment[] @relation("CommentReplies")
+
+  @@index([hazardId, createdAt(sort: Desc)], name: "comments_hazard_idx")
+  @@index([parentCommentId], name: "comments_parent_idx")
+  @@index([userId, createdAt(sort: Desc)], name: "comments_user_idx")
+  @@map("comments")
+}
+
+/// Catalog of possible badges and progression metadata
+model Badge {
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String      @unique @db.VarChar(40)
+  name        String      @db.VarChar(80)
+  tier        Int         @db.SmallInt
+  description String
+  criteria    Json        @db.JsonB
+  isActive    Boolean     @default(true) @map("is_active")
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  userBadges  UserBadge[]
+
+  @@index([tier], name: "badges_tier_idx")
+  @@map("badges")
+}
+
+/// Join table recording earned badges and attribution context
+model UserBadge {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  badgeId         String    @map("badge_id") @db.Uuid
+  earnedAt        DateTime  @default(now()) @map("earned_at") @db.Timestamptz
+  awardedByUserId String?   @map("awarded_by_user_id") @db.Uuid
+  awardReason     String?   @map("award_reason")
+
+  // Relations
+  user            User      @relation("BadgeEarner", fields: [userId], references: [id])
+  badge           Badge     @relation(fields: [badgeId], references: [id])
+  awardedBy       User?     @relation("BadgeAwarder", fields: [awardedByUserId], references: [id])
+
+  @@unique([userId, badgeId], name: "user_badges_unique")
+  @@map("user_badges")
+}
