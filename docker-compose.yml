@@ -1,0 +1,50 @@
+# ============================================================================
+# OPTIONAL: Local Development Only
+# ============================================================================
+# This file is for running PostgreSQL and Redis locally with Docker.
+#
+# For team development, we recommend using cloud services instead:
+#   - Database: Supabase (https://supabase.com) - free tier, PostGIS included
+#   - Cache: Upstash (https://upstash.com) - free tier, serverless Redis
+#
+# See CONTRIBUTING.md for setup instructions.
+# ============================================================================
+
+version: "3.9"
+
+services:
+  db:
+    image: postgis/postgis:15-3.3
+    container_name: plothole_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: plothole
+      POSTGRES_PASSWORD: plothole
+      POSTGRES_DB: plothole
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U plothole"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: plothole_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
