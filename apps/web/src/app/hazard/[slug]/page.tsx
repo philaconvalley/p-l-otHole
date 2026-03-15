@@ -6,6 +6,8 @@ import { db } from "@/lib/db";
 import { SeverityBadge, StatusBadge } from "@/components/severity-badge";
 import { StatBox } from "@/components/stat-box";
 import { VoteSection } from "./vote-section";
+import { NameProposal } from "./name-proposal";
+import { VerifyButton } from "./verify-button";
 import { statusLabel, typeLabel } from "@/lib/format";
 
 const HazardMiniMap = nextDynamic(
@@ -234,23 +236,12 @@ export default async function HazardDetailPage({
 
             {/* Community name + verify */}
             <div className="space-y-4">
-              <div className="bg-[#222] border border-[#333] rounded-xl p-5">
-                <p className="text-sm font-semibold text-[#f5f5f5] mb-1">Community name</p>
-                <p className="text-base font-bold text-[#F99300] mb-1">&ldquo;{hazard.name}&rdquo;</p>
-                <p className="text-xs text-[#6b7280] mb-3">{hazard.upvotes} votes</p>
-                <input type="text" placeholder="Propose a different name..." className="w-full text-sm" />
-              </div>
-
-              <div className="bg-[#222] border border-[#333] rounded-xl p-5">
-                <p className="text-sm font-semibold text-[#f5f5f5] mb-2">In-person verify</p>
-                <p className="text-xs text-[#9ca3af] mb-4">
-                  Confirm this hazard exists at the pinned location. +15 pts.
-                </p>
-                <button className="w-full py-2.5 text-sm font-semibold text-white bg-[#2a2a2a]
-                                   border border-[#444] rounded-lg hover:border-[#888] hover:bg-[#333] transition-colors">
-                  Mark as verified (+15 pts)
-                </button>
-              </div>
+              <NameProposal
+                hazardId={hazard.id}
+                currentName={hazard.name ?? ""}
+                upvotes={hazard.upvotes}
+              />
+              <VerifyButton hazardId={hazard.id} />
             </div>
           </div>
 
