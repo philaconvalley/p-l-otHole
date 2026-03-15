@@ -13,8 +13,7 @@ function createPrismaClient() {
     throw new Error("DATABASE_URL environment variable is not set");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pool = new Pool({ connectionString }) as any;
+  const pool = new Pool({ connectionString }) as unknown as ConstructorParameters<typeof PrismaPg>[0];
   const adapter = new PrismaPg(pool);
 
   return new PrismaClient({
