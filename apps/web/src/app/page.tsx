@@ -53,15 +53,17 @@ export default function MapPage() {
   const fetchHazards = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ limit: "50", sort: "most_voted" });
+      const params = new URLSearchParams({ limit: "100", sort: "most_voted" });
       if (statusFilter === "Resolved") params.set("repairStatus", "resolved");
+      else if (statusFilter !== "Open") params.set("repairStatus", statusFilter.toLowerCase().replace(" ", "_"));
+      if (severityFilter !== "All") params.set("severity", severityFilter.toLowerCase());
       const res = await fetch(`/api/v1/hazards?${params}`);
       const json = await res.json();
       setHazards(json.data ?? []);
     } finally {
       setLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, severityFilter]);
 
   useEffect(() => { fetchHazards(); }, [fetchHazards]);
 
@@ -72,15 +74,14 @@ export default function MapPage() {
       return next;
     });
 
-  // Client-side filter by severity and search
+  // Client-side filter: search + active severity checkboxes (severity pill already pushed to API)
   const visible = hazards.filter(h => {
     const sev = severityLabel(h.severityScore, h.votes.up);
     const sevOk = activeSeverities.size === 0 || activeSeverities.has(
       sev.charAt(0).toUpperCase() + sev.slice(1)
     );
-    const mainOk = severityFilter === "All" || severityLabel(h.severityScore, h.votes.up) === severityFilter.toLowerCase();
     const searchOk = !search || h.name?.toLowerCase().includes(search.toLowerCase());
-    return sevOk && mainOk && searchOk;
+    return sevOk && searchOk;
   });
 
   // Per-severity counts for sidebar
@@ -196,7 +197,7 @@ export default function MapPage() {
 
       {/* ── Map center ──────────────────────────────────────── */}
       <main className="flex-1 relative overflow-hidden">
-        <HazardMap hazards={mapHazards} />
+        <HazardMap hazards={mapHazards} viewMode={viewMode} />
         <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-[#222]/90 border border-[#444] rounded-full text-xs text-[#9ca3af] font-mono pointer-events-none">
           {loading ? "Loading…" : `${visible.length} hazards shown`}
         </div>

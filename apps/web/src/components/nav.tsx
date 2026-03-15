@@ -59,6 +59,17 @@ export function Nav() {
           <div className="h-8 w-20 bg-[#2a2a2a] rounded-full animate-pulse" />
         ) : session?.user ? (
           <div className="flex items-center gap-3">
+            {session.user.isModerator && (
+              <Link
+                href="/admin"
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors
+                  ${pathname.startsWith("/admin")
+                    ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                    : "text-purple-400/70 hover:text-purple-400 border border-transparent hover:border-purple-500/30"}`}
+              >
+                Admin
+              </Link>
+            )}
             <span className="hidden sm:inline text-sm text-[#9ca3af]">
               {session.user.name}
             </span>
