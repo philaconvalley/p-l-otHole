@@ -22,6 +22,8 @@ enum HazardType {
   sinkhole
   drainage
   debris
+
+  @@map("hazard_type")
 }
 
 enum RepairStatus {
@@ -31,17 +33,23 @@ enum RepairStatus {
   in_progress
   resolved
   disputed
+
+  @@map("repair_status")
 }
 
 enum ReportStatus {
   pending
   verified
   rejected
+
+  @@map("report_status")
 }
 
 enum VoteTargetType {
   hazard
   name_proposal
+
+  @@map("vote_target_type")
 }
 
 // =============================================================================
