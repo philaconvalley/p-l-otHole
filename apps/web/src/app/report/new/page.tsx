@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { typeLabel } from "@/lib/format";
@@ -169,7 +168,8 @@ export default function ReportPage() {
               >
                 {preview ? (
                   <div className="relative w-full h-52">
-                    <Image src={preview} alt="Upload preview" fill className="object-cover rounded-xl" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={preview} alt="Upload preview" className="w-full h-full object-cover rounded-xl" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity
                                     rounded-xl flex items-center justify-center">
                       <span className="text-sm text-white font-medium">Click to change</span>
