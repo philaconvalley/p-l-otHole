@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { typeLabel } from "@/lib/format";
@@ -17,10 +16,31 @@ const HAZARD_TYPES = ["Pothole", "Cave-in", "Depression", "Ditch/Trench", "Push-
 
 interface GpsCoords { lat: number; lng: number; locality?: string }
 
+async function resizeToDataUrl(file: File, maxPx = 1200): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
+    };
+    img.onerror = reject;
+    img.src = objectUrl;
+  });
+}
+
 export default function ReportPage() {
   const router = useRouter();
   const [activeStep] = useState(2);
   const [preview, setPreview] = useState<string | null>(null);
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [gps, setGps] = useState<GpsCoords | null>(null);
   const [dragging, setDragging] = useState(false);
   const [hazardType, setHazardType] = useState("Pothole");
@@ -36,6 +56,9 @@ export default function ReportPage() {
     // Show preview
     const url = URL.createObjectURL(file);
     setPreview(url);
+
+    // Resize + encode for storage
+    resizeToDataUrl(file).then(setImageDataUrl).catch(() => setImageDataUrl(null));
 
     // Extract GPS from EXIF
     try {
@@ -87,7 +110,7 @@ export default function ReportPage() {
           type: TYPE_MAP[hazardType] ?? "pothole",
           latitude:  gps?.lat  ?? 39.9526,
           longitude: gps?.lng  ?? -75.1652,
-          images: [],
+          images: imageDataUrl ? [imageDataUrl] : [],
           cityCode: "PHL",
         }),
       });
@@ -169,7 +192,8 @@ export default function ReportPage() {
               >
                 {preview ? (
                   <div className="relative w-full h-52">
-                    <Image src={preview} alt="Upload preview" fill className="object-cover rounded-xl" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={preview} alt="Upload preview" className="w-full h-full object-cover rounded-xl" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity
                                     rounded-xl flex items-center justify-center">
                       <span className="text-sm text-white font-medium">Click to change</span>

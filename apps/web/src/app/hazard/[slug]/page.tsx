@@ -1,11 +1,17 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import nextDynamic from "next/dynamic";
 import { db } from "@/lib/db";
 import { SeverityBadge, StatusBadge } from "@/components/severity-badge";
 import { StatBox } from "@/components/stat-box";
 import { VoteSection } from "./vote-section";
 import { statusLabel, typeLabel } from "@/lib/format";
+
+const HazardMiniMap = nextDynamic(
+  () => import("./hazard-mini-map").then(m => m.HazardMiniMap),
+  { ssr: false, loading: () => <div className="w-full h-full bg-[#1a1a1a]" /> }
+);
 
 const REPAIR_STEPS = [
   { key: "reported",     label: "Reported" },
@@ -173,12 +179,17 @@ export default async function HazardDetailPage({
                 </div>
               )}
             </div>
-            <div className="bg-[#1a1a1a] map-grid border border-[#333] rounded-xl h-56 relative overflow-hidden">
-              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#F99300] ring-2 ring-[#F99300]/30" />
-              {hazard.latitude && hazard.longitude && (
-                <p className="absolute bottom-2 left-0 right-0 text-center text-[9px] text-[#6b7280] font-mono">
-                  {Number(hazard.latitude).toFixed(4)}°N {Math.abs(Number(hazard.longitude)).toFixed(4)}°W
-                </p>
+            <div className="border border-[#333] rounded-xl h-56 overflow-hidden">
+              {hazard.latitude && hazard.longitude ? (
+                <HazardMiniMap
+                  latitude={Number(hazard.latitude)}
+                  longitude={Number(hazard.longitude)}
+                  name={hazard.name ?? "Hazard"}
+                />
+              ) : (
+                <div className="w-full h-full bg-[#1a1a1a] map-grid flex items-center justify-center">
+                  <p className="text-xs text-[#4b5563]">No location data</p>
+                </div>
               )}
             </div>
           </div>
