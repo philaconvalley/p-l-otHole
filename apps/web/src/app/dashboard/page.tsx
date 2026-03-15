@@ -7,37 +7,35 @@ import { statusLabel, severityLabel } from "@/lib/format";
 const REPAIR_STATUSES = ["reported", "acknowledged", "scheduled", "in_progress", "resolved"] as const;
 
 async function getStats() {
-  // Use individual counts instead of groupBy — groupBy has known issues
-  // with Prisma's @prisma/adapter-pg driver adapter
-  const [total, resolved, ...statusCounts] = await Promise.all([
-    db.hazard.count({ where: { deletedAt: null } }),
-    db.hazard.count({ where: { deletedAt: null, repairStatus: "resolved" } }),
-    ...REPAIR_STATUSES.map(s =>
-      db.hazard.count({ where: { deletedAt: null, repairStatus: s } })
-    ),
-  ]);
+  // Avoid count() with enum filters — @prisma/adapter-pg casts to "public.RepairStatus"
+  // which doesn't match the actual DB type name "repair_status". Instead, fetch all
+  // hazards with just the fields we need and compute everything in JS.
+  const all = await db.hazard.findMany({
+    where: { deletedAt: null },
+    orderBy: { upvotes: "desc" },
+    select: {
+      id: true, slug: true, name: true,
+      repairStatus: true, severityScore: true,
+      upvotes: true, createdAt: true,
+    },
+  });
 
-  const statusRows = REPAIR_STATUSES.map((key, i) => ({
+  const total    = all.length;
+  const resolved = all.filter(h => h.repairStatus === "resolved").length;
+  const open     = total - resolved;
+
+  const statusRows = REPAIR_STATUSES.map(key => ({
     repairStatus: key,
-    count: statusCounts[i] ?? 0,
+    count: all.filter(h => h.repairStatus === key).length,
   }));
 
-  const [topHazards, openHazards] = await Promise.all([
-    db.hazard.findMany({
-      where: { deletedAt: null, repairStatus: { not: "resolved" } },
-      orderBy: [{ upvotes: "desc" }],
-      take: 5,
-      select: { id: true, slug: true, name: true, upvotes: true, severityScore: true, createdAt: true },
-    }),
-    db.hazard.findMany({
-      where: { deletedAt: null, repairStatus: { not: "resolved" } },
-      select: { createdAt: true },
-      take: 200,
-    }),
-  ]);
+  const topHazards = all
+    .filter(h => h.repairStatus !== "resolved")
+    .slice(0, 5);
 
-  const open = total - resolved;
-  const critical = topHazards.filter(h => h.severityScore >= 60 || h.upvotes >= 100).length;
+  const openHazards = all.filter(h => h.repairStatus !== "resolved");
+
+  const critical   = topHazards.filter(h => h.severityScore >= 60 || h.upvotes >= 100).length;
   const avgDaysOpen = openHazards.length
     ? Math.round(openHazards.reduce((s, h) => s + (Date.now() - h.createdAt.getTime()) / 86_400_000, 0) / openHazards.length)
     : 0;
@@ -46,19 +44,7 @@ async function getStats() {
 }
 
 export default async function DashboardPage() {
-  let stats;
-  try {
-    stats = await getStats();
-  } catch (err) {
-    return (
-      <div className="min-h-[calc(100vh-56px)] bg-[#171717] p-6 flex items-center justify-center">
-        <pre className="text-red-400 text-xs bg-[#222] border border-red-900/40 rounded-xl p-6 max-w-2xl overflow-auto">
-          {String(err)}{"\n\n"}{err instanceof Error ? err.stack : ""}
-        </pre>
-      </div>
-    );
-  }
-  const { open, critical, avgDaysOpen, statusRows, topHazards } = stats;
+  const { open, critical, avgDaysOpen, statusRows, topHazards } = await getStats();
 
   const maxCount = Math.max(...statusRows.map(r => r.count), 1);
   const statusData = statusRows.map(({ repairStatus: key, count }) => ({
