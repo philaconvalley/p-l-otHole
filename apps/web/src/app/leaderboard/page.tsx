@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { SeverityBadge } from "@/components/severity-badge";
 import { severityLabel } from "@/lib/format";
 import { db } from "@/lib/db";

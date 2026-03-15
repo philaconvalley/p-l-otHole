@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { StatBox } from "@/components/stat-box";
 import { SeverityBadge } from "@/components/severity-badge";
 import { db } from "@/lib/db";
