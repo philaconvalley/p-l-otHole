@@ -1,18 +1,25 @@
 export const dynamic = "force-dynamic";
+import Link from "next/link";
 import { SeverityBadge } from "@/components/severity-badge";
 import { severityLabel } from "@/lib/format";
 import { db } from "@/lib/db";
 
-async function getData() {
+async function getData(period: "month" | "all") {
+  const since = period === "month"
+    ? new Date(Date.now() - 30 * 86_400_000)
+    : undefined;
+
+  const dateFilter = since ? { createdAt: { gte: since } } : {};
+
   const [users, topHazards] = await Promise.all([
     db.user.findMany({
-      where: { isBanned: false },
+      where: { isBanned: false, ...dateFilter },
       orderBy: { reputationScore: "desc" },
       take: 10,
       select: { id: true, username: true, reputationScore: true, reportsSubmitted: true, votesCast: true },
     }),
     db.hazard.findMany({
-      where: { deletedAt: null },
+      where: { deletedAt: null, ...dateFilter },
       orderBy: { upvotes: "desc" },
       take: 5,
       select: { id: true, slug: true, name: true, upvotes: true, severityScore: true },
@@ -24,8 +31,13 @@ async function getData() {
 const MEDALS = ["🥇", "🥈", "🥉"];
 const RANK_LABELS = ["City Guardian", "City Guardian", "Civic Scout", "Civic Scout", "Reporter", "Reporter", "Reporter", "Reporter", "Reporter", "Newcomer"];
 
-export default async function LeaderboardPage() {
-  const { users, topHazards } = await getData();
+export default async function LeaderboardPage({
+  searchParams,
+}: {
+  searchParams: { period?: string };
+}) {
+  const period = searchParams.period === "month" ? "month" : "all";
+  const { users, topHazards } = await getData(period);
 
   return (
     <div className="min-h-[calc(100vh-56px)] bg-[#171717] p-6">
@@ -33,11 +45,14 @@ export default async function LeaderboardPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-[#f5f5f5]">Leaderboard</h1>
           <div className="flex gap-2">
-            {["This month", "All time"].map((t, i) => (
-              <button key={t} className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors
-                ${i === 1 ? "bg-[#F99300] text-white border-[#F99300]" : "text-[#9ca3af] border-[#444] hover:border-[#888]"}`}>
-                {t}
-              </button>
+            {([["month", "This month"], ["all", "All time"]] as const).map(([val, label]) => (
+              <Link key={val} href={`/leaderboard?period=${val}`}
+                className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors
+                  ${period === val
+                    ? "bg-[#F99300] text-white border-[#F99300]"
+                    : "text-[#9ca3af] border-[#444] hover:border-[#888]"}`}>
+                {label}
+              </Link>
             ))}
           </div>
         </div>
