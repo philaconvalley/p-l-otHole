@@ -9,7 +9,8 @@ import type { Route } from "next";
 const STATIC_NAV_LINKS = [
   { href: "/", label: "Map" },
   { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/dashboard", label: "Civic dashboard" },
+  { href: "/dashboard", label: "Civic Dashboard" },
+  { href: "/roadmap", label: "Roadmap" },
   { href: "/export", label: "Export" },
 ];
 

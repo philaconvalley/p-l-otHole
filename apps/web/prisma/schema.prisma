@@ -52,6 +52,18 @@ enum VoteTargetType {
   @@map("vote_target_type")
 }
 
+enum PhaseStatus {
+  active
+  upcoming
+  future
+}
+
+enum FeatureStatus {
+  shipped
+  in_progress
+  planned
+}
+
 // =============================================================================
 // MODELS
 // =============================================================================
@@ -226,4 +238,61 @@ model UserBadge {
 
   @@unique([userId, badgeId], name: "user_badges_unique")
   @@map("user_badges")
+}
+
+// =============================================================================
+// ROADMAP
+// =============================================================================
+
+/// Development phases for the public roadmap
+model RoadmapPhase {
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  number    Int         @unique
+  title     String      @db.VarChar(120)
+  timeline  String?     @db.VarChar(200)
+  status    PhaseStatus @default(upcoming)
+  progress  Int         @default(0)
+  sortOrder Int         @default(0) @map("sort_order")
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  features  RoadmapFeature[]
+  changelog RoadmapChangelog[]
+
+  @@map("roadmap_phases")
+}
+
+/// Individual features within each roadmap phase
+model RoadmapFeature {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phaseId     String        @map("phase_id") @db.Uuid
+  title       String        @db.VarChar(200)
+  description String?
+  status      FeatureStatus @default(planned)
+  sortOrder   Int           @default(0) @map("sort_order")
+  shippedAt   DateTime?     @map("shipped_at") @db.Timestamptz
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  phase       RoadmapPhase  @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+
+  @@index([phaseId, sortOrder], name: "roadmap_features_phase_idx")
+  @@map("roadmap_features")
+}
+
+/// Changelog entries for the public roadmap
+model RoadmapChangelog {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phaseId     String?      @map("phase_id") @db.Uuid
+  title       String
+  publishedAt DateTime     @default(now()) @map("published_at") @db.Date
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  phase       RoadmapPhase? @relation(fields: [phaseId], references: [id], onDelete: SetNull)
+
+  @@index([publishedAt(sort: Desc)], name: "roadmap_changelog_date_idx")
+  @@map("roadmap_changelog")
 }

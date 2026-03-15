@@ -13,16 +13,22 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "db:migrate": "pnpm --filter @plothole/db migrate",
-    "db:seed": "pnpm --filter @plothole/db seed"
+    "db:seed": "pnpm --filter @plothole/db seed",
+    "prepare": "husky"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["@prisma/engines", "esbuild", "prisma"]
+    "onlyBuiltDependencies": [
+      "@prisma/engines",
+      "esbuild",
+      "prisma"
+    ]
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.7",
     "prettier": "^3.2.5",
     "typescript": "^5.4.5"
   }

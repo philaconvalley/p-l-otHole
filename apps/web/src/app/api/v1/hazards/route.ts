@@ -140,46 +140,52 @@ export async function POST(request: NextRequest) {
     // Generate unique slug from name
     const slug = await generateUniqueSlug(input.name);
 
-    // Create the hazard
-    const hazard = await db.hazard.create({
-      data: {
-        name: input.name,
-        slug,
-        description: input.description,
-        type: input.type,
-        latitude: input.latitude,
-        longitude: input.longitude,
-        images: input.images,
-        cityCode: input.cityCode,
-        createdByUserId: user.id,
-        reportsCount: 1,
-      },
-    });
+    // Create hazard, report, and update user in a transaction
+    // This ensures all-or-nothing: if any step fails, all changes are rolled back
+    const hazard = await db.$transaction(async (tx) => {
+      // Create the hazard
+      const newHazard = await tx.hazard.create({
+        data: {
+          name: input.name,
+          slug,
+          description: input.description,
+          type: input.type,
+          latitude: input.latitude,
+          longitude: input.longitude,
+          images: input.images,
+          cityCode: input.cityCode,
+          createdByUserId: user.id,
+          reportsCount: 1,
+        },
+      });
 
-    // Populate PostGIS geography column (Prisma cannot set Unsupported fields via create)
-    await db.$executeRaw`
-      UPDATE hazards
-      SET location = ST_SetSRID(ST_MakePoint(${Number(input.longitude)}, ${Number(input.latitude)}), 4326)::geography
-      WHERE id = ${hazard.id}::uuid
-    `;
+      // Populate PostGIS geography column (Prisma cannot set Unsupported fields via create)
+      await tx.$executeRaw`
+        UPDATE hazards
+        SET location = ST_SetSRID(ST_MakePoint(${Number(input.longitude)}, ${Number(input.latitude)}), 4326)::geography
+        WHERE id = ${newHazard.id}::uuid
+      `;
 
-    // Also create the initial report
-    await db.report.create({
-      data: {
-        hazardId: hazard.id,
-        reporterUserId: user.id,
-        description: input.description,
-        imageUrls: input.images,
-        sourceLatitude: input.latitude,
-        sourceLongitude: input.longitude,
-        status: "pending",
-      },
-    });
+      // Create the initial report
+      await tx.report.create({
+        data: {
+          hazardId: newHazard.id,
+          reporterUserId: user.id,
+          description: input.description,
+          imageUrls: input.images,
+          sourceLatitude: input.latitude,
+          sourceLongitude: input.longitude,
+          status: "pending",
+        },
+      });
 
-    // Increment user's report count
-    await db.user.update({
-      where: { id: user.id },
-      data: { reportsSubmitted: { increment: 1 } },
+      // Increment user's report count
+      await tx.user.update({
+        where: { id: user.id },
+        data: { reportsSubmitted: { increment: 1 } },
+      });
+
+      return newHazard;
     });
 
     return apiSuccess(

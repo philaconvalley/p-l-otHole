@@ -104,7 +104,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     return apiSuccess({
       hazardId,
-      oderId: user.id,
+      voterId: user.id,
       value: vote.value,
       note: vote.note,
       isNewVote,
