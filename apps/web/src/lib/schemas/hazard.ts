@@ -39,7 +39,7 @@ export const createHazardSchema = z.object({
     .min(-180, "Longitude must be between -180 and 180")
     .max(180, "Longitude must be between -180 and 180"),
   images: z
-    .array(z.string().url("Each image must be a valid URL"))
+    .array(z.string().min(1))   // accepts both https:// URLs and data: URIs
     .max(10, "Maximum 10 images allowed")
     .default([]),
   cityCode: z
@@ -84,6 +84,7 @@ export const listHazardsQuerySchema = z.object({
   sort: z
     .enum(["newest", "oldest", "severity", "most_voted"])
     .default("newest"),
+  severity: z.enum(["critical", "high", "moderate", "low"]).optional(),
 });
 
 // Search hazards query params (radius search)

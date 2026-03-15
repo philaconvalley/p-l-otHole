@@ -36,7 +36,12 @@ export default function AuthPage() {
         const data = await res.json();
 
         if (!res.ok) {
-          setError(data.error?.message || "Failed to create account");
+          // Surface specific field validation errors (e.g. password rules)
+          const details = data.error?.details as Record<string, string[]> | undefined;
+          const allMessages = details
+            ? Object.values(details).flat()
+            : [];
+          setError(allMessages.length > 0 ? allMessages.join(" · ") : (data.error?.message || "Failed to create account"));
           setIsLoading(false);
           return;
         }

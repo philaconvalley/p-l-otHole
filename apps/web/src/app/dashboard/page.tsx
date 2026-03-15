@@ -1,33 +1,42 @@
 export const dynamic = "force-dynamic";
 import { StatBox } from "@/components/stat-box";
 import { SeverityBadge } from "@/components/severity-badge";
+import { PressureCardButton } from "@/components/pressure-card-modal";
 import { db } from "@/lib/db";
 import { statusLabel, severityLabel } from "@/lib/format";
 
-async function getStats() {
-  const [total, resolved, statusRows, topHazards, openHazards] = await Promise.all([
-    db.hazard.count({ where: { deletedAt: null } }),
-    db.hazard.count({ where: { deletedAt: null, repairStatus: "resolved" } }),
-    db.hazard.groupBy({
-      by: ["repairStatus"],
-      where: { deletedAt: null },
-      _count: { _all: true },
-    }),
-    db.hazard.findMany({
-      where: { deletedAt: null, repairStatus: { not: "resolved" } },
-      orderBy: [{ upvotes: "desc" }],
-      take: 5,
-      select: { id: true, slug: true, name: true, upvotes: true, severityScore: true, createdAt: true },
-    }),
-    db.hazard.findMany({
-      where: { deletedAt: null, repairStatus: { not: "resolved" } },
-      select: { createdAt: true },
-      take: 200,
-    }),
-  ]);
+const REPAIR_STATUSES = ["reported", "acknowledged", "scheduled", "in_progress", "resolved"] as const;
 
-  const open = total - resolved;
-  const critical = topHazards.filter(h => h.severityScore >= 60 || h.upvotes >= 100).length;
+async function getStats() {
+  // Avoid count() with enum filters — @prisma/adapter-pg casts to "public.RepairStatus"
+  // which doesn't match the actual DB type name "repair_status". Instead, fetch all
+  // hazards with just the fields we need and compute everything in JS.
+  const all = await db.hazard.findMany({
+    where: { deletedAt: null },
+    orderBy: { upvotes: "desc" },
+    select: {
+      id: true, slug: true, name: true,
+      repairStatus: true, severityScore: true,
+      upvotes: true, createdAt: true,
+    },
+  });
+
+  const total    = all.length;
+  const resolved = all.filter(h => h.repairStatus === "resolved").length;
+  const open     = total - resolved;
+
+  const statusRows = REPAIR_STATUSES.map(key => ({
+    repairStatus: key,
+    count: all.filter(h => h.repairStatus === key).length,
+  }));
+
+  const topHazards = all
+    .filter(h => h.repairStatus !== "resolved")
+    .slice(0, 5);
+
+  const openHazards = all.filter(h => h.repairStatus !== "resolved");
+
+  const critical   = topHazards.filter(h => h.severityScore >= 60 || h.upvotes >= 100).length;
   const avgDaysOpen = openHazards.length
     ? Math.round(openHazards.reduce((s, h) => s + (Date.now() - h.createdAt.getTime()) / 86_400_000, 0) / openHazards.length)
     : 0;
@@ -38,11 +47,10 @@ async function getStats() {
 export default async function DashboardPage() {
   const { open, critical, avgDaysOpen, statusRows, topHazards } = await getStats();
 
-  const STATUS_ORDER = ["reported", "acknowledged", "scheduled", "in_progress", "resolved"];
-  const maxCount = Math.max(...statusRows.map(r => r._count._all), 1);
-  const statusData = STATUS_ORDER.map(key => ({
+  const maxCount = Math.max(...statusRows.map(r => r.count), 1);
+  const statusData = statusRows.map(({ repairStatus: key, count }) => ({
     label: statusLabel(key),
-    count: statusRows.find(r => r.repairStatus === key)?._count._all ?? 0,
+    count,
     cls:
       key === "reported"     ? "bg-[#F99300]" :
       key === "acknowledged" ? "bg-[#f97316]" :
@@ -66,9 +74,7 @@ export default async function DashboardPage() {
             <p className="text-sm text-[#6b7280] mt-1">Live from database</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="px-4 py-2 text-sm font-semibold text-white bg-[#F99300] rounded-lg hover:bg-[#e07e00] transition-colors">
-              Generate pressure card
-            </button>
+            <PressureCardButton open={open} critical={critical} avgDays={avgDaysOpen} />
           </div>
         </div>
 
