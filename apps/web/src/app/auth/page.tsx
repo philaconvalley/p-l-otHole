@@ -1,14 +1,14 @@
+import Image from "next/image";
+
 export default function AuthPage() {
   return (
     <div className="min-h-[calc(100vh-56px)] bg-[#171717] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold mb-2">
-            <span className="text-[#f5f5f5]">P</span>
-            <span className="text-[#e5521e]">(l)ot</span>
-            <span className="text-[#f5f5f5]">Hole</span>
-          </h1>
+          <div className="flex justify-center mb-3">
+            <Image src="/logo.png" alt="P(l)otHole" width={160} height={42} className="h-10 w-auto" />
+          </div>
           <p className="text-sm text-[#6b7280]">Map it. Name it. Shame it. Fix it.</p>
         </div>
 

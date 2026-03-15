@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Route } from "next";
@@ -18,13 +19,8 @@ export function Nav() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-[#171717] border-b border-[#2a2a2a] flex items-center px-6 gap-8">
       {/* Logo */}
-      <Link
-        href="/"
-        className="flex-shrink-0 font-bold text-xl tracking-tight leading-none"
-      >
-        <span className="text-white">P</span>
-        <span className="text-[#e5521e]">(l)ot</span>
-        <span className="text-white">Hole</span>
+      <Link href="/" className="flex-shrink-0">
+        <Image src="/logo.png" alt="P(l)otHole" width={120} height={32} className="h-8 w-auto" priority />
       </Link>
 
       {/* Nav links */}
