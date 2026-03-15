@@ -15,22 +15,23 @@ export interface SessionUser {
  * Works with both App Router (no request needed) and Route Handlers (with request).
  */
 export async function getSession(request?: Request): Promise<SessionUser | null> {
-  // Development: allow passing user ID via header for testing
-  if (process.env.NODE_ENV === "development" && request) {
-    const devUserId = request.headers.get("x-dev-user-id");
-    if (devUserId) {
-      const user = await db.user.findUnique({
-        where: { id: devUserId },
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          isModerator: true,
-        },
-      });
-      return user;
-    }
-  }
+  // SECURITY: Dev auth bypass disabled for production safety
+  // To re-enable for local testing, set ENABLE_DEV_AUTH=true in .env.local
+  // if (process.env.ENABLE_DEV_AUTH === "true" && process.env.NODE_ENV === "development" && request) {
+  //   const devUserId = request.headers.get("x-dev-user-id");
+  //   if (devUserId) {
+  //     const user = await db.user.findUnique({
+  //       where: { id: devUserId },
+  //       select: {
+  //         id: true,
+  //         username: true,
+  //         email: true,
+  //         isModerator: true,
+  //       },
+  //     });
+  //     return user;
+  //   }
+  // }
 
   const session = await getServerSession(authOptions);
 
