@@ -8,20 +8,29 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "db:generate": "prisma generate"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/s3-request-presigner": "^3.600.0",
     "@plothole/api": "workspace:*",
+    "@prisma/adapter-pg": "^6.0.0",
+    "@prisma/client": "^6.0.0",
+    "ioredis": "^5.4.1",
     "next": "14.2.3",
     "next-auth": "^4.24.7",
+    "pg": "^8.12.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "mapbox-gl": "^3.4.0",
     "react-map-gl": "^7.1.7",
+    "slugify": "^1.6.6",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
+    "@types/pg": "^8.11.6",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "eslint": "^8.57.0",
@@ -29,8 +38,12 @@
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "prettier-plugin-tailwindcss": "^0.6.1",
+    "prisma": "^6.0.0",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@prisma/engines", "esbuild", "prisma"]
   }
 }

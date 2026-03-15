@@ -1,0 +1,979 @@
+{
+  "info": {
+    "name": "P(l)otHole API",
+    "description": "Complete test collection for the P(l)otHole road hazard API.\n\n## Auth\nIn development the server reads `x-dev-user-id` to identify the caller. Set the collection variable `userId` to the UUID of any seeded user. Run the **Setup – capture IDs** folder first to populate `hazardId` and `userId` automatically.\n\n## Variables\n| Variable | Default | Purpose |\n|---|---|---|\n| `baseUrl` | `http://localhost:3000/api/v1` | API root |\n| `userId` | *(set after seed)* | Authenticated user id |\n| `modUserId` | *(set after seed)* | Moderator user id |\n| `hazardId` | *(auto-set)* | Hazard used by single-resource tests |\n| `newHazardId` | *(auto-set)* | Hazard created during POST test |",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",    "value": "http://localhost:3000/api/v1", "type": "string" },
+    { "key": "userId",     "value": "", "type": "string",
+      "description": "UUID of an ordinary seeded user (alice_spotter). Paste after running db:seed." },
+    { "key": "modUserId",  "value": "", "type": "string",
+      "description": "UUID of the moderator seeded user (city_mod). Paste after running db:seed." },
+    { "key": "hazardId",   "value": "", "type": "string",
+      "description": "Auto-populated by the 'List Hazards' pre-test script." },
+    { "key": "newHazardId","value": "", "type": "string",
+      "description": "Auto-populated after POST /hazards." }
+  ],
+  "item": [
+    {
+      "name": "Hazards",
+      "item": [
+        {
+          "name": "List Hazards (no auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has data array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('data').that.is.an('array');",
+                  "  pm.expect(body).to.have.property('hasMore');",
+                  "  if (body.data.length > 0) {",
+                  "    pm.collectionVariables.set('hazardId', body.data[0].id);",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hazards",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards"]
+            }
+          }
+        },
+        {
+          "name": "List Hazards – filter by type",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('All results are potholes', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  data.forEach(h => pm.expect(h.type).to.equal('pothole'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hazards?type=pothole&sort=severity&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards"],
+              "query": [
+                { "key": "type",         "value": "pothole" },
+                { "key": "sort",         "value": "severity" },
+                { "key": "limit",        "value": "5" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Hazards – filter by repairStatus",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hazards?repairStatus=reported&sort=newest&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards"],
+              "query": [
+                { "key": "repairStatus", "value": "reported" },
+                { "key": "sort",         "value": "newest" },
+                { "key": "limit",        "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Hazards – filter by city",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('All results belong to SF', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  data.forEach(h => pm.expect(h.cityCode).to.equal('SF'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hazards?city=SF",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards"],
+              "query": [
+                { "key": "city", "value": "SF" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Hazard by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has expected fields', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  ['id','type','location','severityScore','votes','repairStatus','daysOpen','voteVelocity']",
+                  "    .forEach(f => pm.expect(data).to.have.property(f));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hazards/{{hazardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "{{hazardId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Hazard – 404 (invalid id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Error envelope present', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hazards/00000000-0000-0000-0000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "00000000-0000-0000-0000-000000000000"]
+            }
+          }
+        },
+        {
+          "name": "Create Hazard (auth required)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns created hazard', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  pm.expect(data.type).to.equal('pothole');",
+                  "  pm.expect(data.repairStatus).to.equal('reported');",
+                  "  pm.collectionVariables.set('newHazardId', data.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",   "value": "application/json" },
+              { "key": "x-dev-user-id",  "value": "{{userId}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Pothole – API Check\",\n  \"description\": \"A deep pothole created via the Postman collection for testing purposes.\",\n  \"type\": \"pothole\",\n  \"latitude\": 37.7749,\n  \"longitude\": -122.4194,\n  \"images\": [\n    \"https://cdn.plothole.org/hazards/tmp/test-pothole.jpg\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hazards",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards"]
+            }
+          }
+        },
+        {
+          "name": "Create Hazard – 401 (no auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Should Fail\",\n  \"description\": \"No auth header provided.\",\n  \"type\": \"crack\",\n  \"latitude\": 37.7749,\n  \"longitude\": -122.4194\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hazards",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards"]
+            }
+          }
+        },
+        {
+          "name": "Create Hazard – 400 (validation error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('VALIDATION_ERROR code', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.error.code).to.equal('VALIDATION_ERROR');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "x-dev-user-id", "value": "{{userId}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Missing required fields\",\n  \"latitude\": 999\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hazards",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards"]
+            }
+          }
+        },
+        {
+          "name": "Update Hazard (owner / mod)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('repairStatus updated', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  pm.expect(data.repairStatus).to.equal('scheduled');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "x-dev-user-id", "value": "{{modUserId}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"repairStatus\": \"scheduled\",\n  \"cityTicketId\": \"SF-2026-99999\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hazards/{{newHazardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "{{newHazardId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Hazard – 401 (no auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"repairStatus\": \"resolved\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hazards/{{newHazardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "{{newHazardId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Hazard (moderator)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "x-dev-user-id", "value": "{{modUserId}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/hazards/{{newHazardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "{{newHazardId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Hazard – 403 (regular user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "x-dev-user-id", "value": "{{userId}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/hazards/{{hazardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "{{hazardId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hazards – Search",
+      "item": [
+        {
+          "name": "Search by Radius (SF downtown)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Results have distanceMeters', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  data.forEach(h => pm.expect(h).to.have.property('distanceMeters'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hazards/search?lat=37.7749&lng=-122.4194&radiusMeters=2000",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "search"],
+              "query": [
+                { "key": "lat",          "value": "37.7749" },
+                { "key": "lng",          "value": "-122.4194" },
+                { "key": "radiusMeters", "value": "2000" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search – with type filter",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hazards/search?lat=37.7749&lng=-122.4194&radiusMeters=5000&type=sinkhole",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "search"],
+              "query": [
+                { "key": "lat",          "value": "37.7749" },
+                { "key": "lng",          "value": "-122.4194" },
+                { "key": "radiusMeters", "value": "5000" },
+                { "key": "type",         "value": "sinkhole" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search – 400 (missing required params)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hazards/search?lat=37.7749",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "search"],
+              "query": [
+                { "key": "lat", "value": "37.7749" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search – 400 (radius too large)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hazards/search?lat=37.7749&lng=-122.4194&radiusMeters=99999",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "search"],
+              "query": [
+                { "key": "lat",          "value": "37.7749" },
+                { "key": "lng",          "value": "-122.4194" },
+                { "key": "radiusMeters", "value": "99999" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hazards – Votes",
+      "item": [
+        {
+          "name": "Cast Vote (severity 4)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 201', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "pm.test('Returns vote data', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  pm.expect(data).to.have.property('value');",
+                  "  pm.expect(data).to.have.property('severityScore');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "x-dev-user-id", "value": "{{userId}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 4,\n  \"note\": \"Almost hit my bumper on this one.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hazards/{{hazardId}}/vote",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "{{hazardId}}", "vote"]
+            }
+          }
+        },
+        {
+          "name": "Update Vote (change to 2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Vote value updated', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  pm.expect(data.value).to.equal(2);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "x-dev-user-id", "value": "{{userId}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 2,\n  \"note\": \"Re-inspected – not as bad as I thought.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hazards/{{hazardId}}/vote",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "{{hazardId}}", "vote"]
+            }
+          }
+        },
+        {
+          "name": "Vote – 401 (no auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hazards/{{hazardId}}/vote",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "{{hazardId}}", "vote"]
+            }
+          }
+        },
+        {
+          "name": "Vote – 400 (value out of range)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "x-dev-user-id", "value": "{{userId}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 99\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hazards/{{hazardId}}/vote",
+              "host": ["{{baseUrl}}"],
+              "path": ["hazards", "{{hazardId}}", "vote"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get My Profile (auth required)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has expected fields', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  ['id','username','email','reputationScore','reportsSubmitted','votesCast','badges']",
+                  "    .forEach(f => pm.expect(data).to.have.property(f));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-dev-user-id", "value": "{{userId}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            }
+          }
+        },
+        {
+          "name": "Get My Profile – 401 (no auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID (public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has expected public fields', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  ['id','username','reputationScore','reportsSubmitted']",
+                  "    .forEach(f => pm.expect(data).to.have.property(f));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get User – 404 (invalid id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/00000000-0000-0000-0000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "00000000-0000-0000-0000-000000000000"]
+            }
+          }
+        },
+        {
+          "name": "Get User Badges",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has earned and progress arrays', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  pm.expect(data).to.have.property('earned');",
+                  "  pm.expect(data).to.have.property('progress');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/badges",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}", "badges"]
+            }
+          }
+        },
+        {
+          "name": "Leaderboard – all time",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has ranked data', () => {",
+                  "  const { data } = pm.response.json();",
+                  "  pm.expect(data).to.be.an('array');",
+                  "  if (data.length > 0) {",
+                  "    pm.expect(data[0]).to.have.property('rank');",
+                  "    pm.expect(data[0]).to.have.property('reputationScore');",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/leaderboard?period=all_time&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "leaderboard"],
+              "query": [
+                { "key": "period", "value": "all_time" },
+                { "key": "limit",  "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Leaderboard – weekly, city filter",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/leaderboard?period=weekly&city=SF&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "leaderboard"],
+              "query": [
+                { "key": "period", "value": "weekly" },
+                { "key": "city",   "value": "SF" },
+                { "key": "limit",  "value": "5" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exports",
+      "item": [
+        {
+          "name": "Export GeoJSON – all hazards",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('GeoJSON FeatureCollection', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.type).to.equal('FeatureCollection');",
+                  "  pm.expect(body.features).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exports/geojson",
+              "host": ["{{baseUrl}}"],
+              "path": ["exports", "geojson"]
+            }
+          }
+        },
+        {
+          "name": "Export GeoJSON – filtered (city + type)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exports/geojson?city=SF&type=pothole",
+              "host": ["{{baseUrl}}"],
+              "path": ["exports", "geojson"],
+              "query": [
+                { "key": "city", "value": "SF" },
+                { "key": "type", "value": "pothole" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Export GeoJSON – updatedSince filter",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exports/geojson?updatedSince=2026-01-01T00:00:00Z",
+              "host": ["{{baseUrl}}"],
+              "path": ["exports", "geojson"],
+              "query": [
+                { "key": "updatedSince", "value": "2026-01-01T00:00:00Z" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Export CSV – all hazards",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Content-Type is text/csv', () => {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('text/csv');",
+                  "});",
+                  "pm.test('CSV has header row', () => {",
+                  "  const text = pm.response.text();",
+                  "  pm.expect(text).to.include('id');",
+                  "  pm.expect(text).to.include('latitude');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exports/csv",
+              "host": ["{{baseUrl}}"],
+              "path": ["exports", "csv"]
+            }
+          }
+        },
+        {
+          "name": "Export CSV – filtered (city + repairStatus)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exports/csv?city=SF&repairStatus=acknowledged",
+              "host": ["{{baseUrl}}"],
+              "path": ["exports", "csv"],
+              "query": [
+                { "key": "city",         "value": "SF" },
+                { "key": "repairStatus", "value": "acknowledged" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
