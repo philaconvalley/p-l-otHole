@@ -3,6 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { typeLabel } from "@/lib/format";
 
 const STEPS = [
   { n: 1, label: "Photo" },
@@ -16,11 +18,16 @@ const HAZARD_TYPES = ["Pothole", "Cave-in", "Depression", "Ditch/Trench", "Push-
 interface GpsCoords { lat: number; lng: number; locality?: string }
 
 export default function ReportPage() {
+  const router = useRouter();
   const [activeStep] = useState(2);
   const [preview, setPreview] = useState<string | null>(null);
   const [gps, setGps] = useState<GpsCoords | null>(null);
   const [dragging, setDragging] = useState(false);
   const [hazardType, setHazardType] = useState("Pothole");
+  const [name, setName]           = useState("");
+  const [notes, setNotes]         = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError]         = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(async (file: File) => {
@@ -59,8 +66,49 @@ export default function ReportPage() {
   const onDragOver = (e: React.DragEvent) => { e.preventDefault(); setDragging(true); };
   const onDragLeave = () => setDragging(false);
 
+  // API type mapping: UI label → schema enum
+  const TYPE_MAP: Record<string, string> = {
+    "Pothole": "pothole", "Cave-in": "sinkhole", "Depression": "sinkhole",
+    "Ditch/Trench": "drainage", "Push-up": "crack", "Other": "debris",
+  };
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) { setError("Community name is required"); return; }
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/v1/hazards", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          description: notes.trim() || name.trim(),
+          type: TYPE_MAP[hazardType] ?? "pothole",
+          latitude:  gps?.lat  ?? 39.9526,
+          longitude: gps?.lng  ?? -75.1652,
+          images: [],
+          cityCode: "PHL",
+        }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        router.push(`/hazard/${json.data?.slug ?? ""}`);
+      } else if (res.status === 401) {
+        setError("Sign in to report a hazard");
+      } else {
+        const json = await res.json().catch(() => ({}));
+        setError(json.error ?? "Failed to submit report");
+      }
+    } catch {
+      setError("Network error — please try again");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
-    <div className="min-h-[calc(100vh-56px)] bg-[#171717]">
+    <div className="min-h-[calc(100vh-56px)] bg-[#171717]" onSubmit={handleSubmit}>
       {/* Progress bar */}
       <div className="border-b border-[#2a2a2a] bg-[#171717]">
         <div className="max-w-4xl mx-auto px-6 py-4">
@@ -192,6 +240,8 @@ export default function ReportPage() {
               </label>
               <input
                 type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
                 placeholder={`e.g. "The Abyss on 5th"`}
                 className="w-full"
               />
@@ -224,6 +274,8 @@ export default function ReportPage() {
               <label className="block text-sm text-[#9ca3af] mb-2">Notes</label>
               <textarea
                 rows={4}
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
                 placeholder="Estimated dimensions, safety risk, nearby landmarks..."
                 className="w-full resize-none"
               />
@@ -240,11 +292,20 @@ export default function ReportPage() {
 
         {/* Footer actions */}
         <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-[#2a2a2a]">
+          {error && (
+            <p className="text-sm text-red-400 mr-auto">{error}</p>
+          )}
           <Link href="/" className="px-6 py-2 text-sm font-medium text-[#9ca3af] hover:text-white border border-[#444] rounded-full transition-colors">
             Cancel
           </Link>
-          <button className="px-6 py-2 text-sm font-semibold text-white bg-[#e5521e] rounded-full hover:bg-[#cc4418] transition-colors flex items-center gap-2">
-            Submit report <span>→</span>
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={submitting}
+            className={`px-6 py-2 text-sm font-semibold text-white bg-[#e5521e] rounded-full flex items-center gap-2 transition-colors
+              ${submitting ? "opacity-60 cursor-not-allowed" : "hover:bg-[#cc4418]"}`}
+          >
+            {submitting ? "Submitting…" : <>Submit report <span>→</span></>}
           </button>
         </div>
       </div>
