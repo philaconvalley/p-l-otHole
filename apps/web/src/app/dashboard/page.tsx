@@ -46,7 +46,19 @@ async function getStats() {
 }
 
 export default async function DashboardPage() {
-  const { open, critical, avgDaysOpen, statusRows, topHazards } = await getStats();
+  let stats;
+  try {
+    stats = await getStats();
+  } catch (err) {
+    return (
+      <div className="min-h-[calc(100vh-56px)] bg-[#171717] p-6 flex items-center justify-center">
+        <pre className="text-red-400 text-xs bg-[#222] border border-red-900/40 rounded-xl p-6 max-w-2xl overflow-auto">
+          {String(err)}{"\n\n"}{err instanceof Error ? err.stack : ""}
+        </pre>
+      </div>
+    );
+  }
+  const { open, critical, avgDaysOpen, statusRows, topHazards } = stats;
 
   const maxCount = Math.max(...statusRows.map(r => r.count), 1);
   const statusData = statusRows.map(({ repairStatus: key, count }) => ({
