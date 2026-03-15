@@ -27,6 +27,8 @@ jobs:
 
       - name: Generate Prisma client
         run: pnpm --filter web db:generate
+        env:
+          DATABASE_URL: postgresql://plothole:plothole@localhost:5432/plothole
 
       - name: Lint
         run: pnpm lint
