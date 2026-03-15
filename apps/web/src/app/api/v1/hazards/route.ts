@@ -146,6 +146,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Populate PostGIS geography column (Prisma cannot set Unsupported fields via create)
+    await db.$executeRaw`
+      UPDATE hazards
+      SET location = ST_SetSRID(ST_MakePoint(${Number(input.longitude)}, ${Number(input.latitude)}), 4326)::geography
+      WHERE id = ${hazard.id}::uuid
+    `;
+
     // Also create the initial report
     await db.report.create({
       data: {
