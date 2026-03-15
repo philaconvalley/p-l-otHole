@@ -5,13 +5,14 @@ on:
     branches: [main]
     paths:
       - "www/**"
+      - "packages/db/migrations/**"
 
   # Allow manual trigger from the Actions tab
   workflow_dispatch:
 
 jobs:
   deploy:
-    name: Sync www/ to server
+    name: Sync www/ and run migrations
     runs-on: ubuntu-latest
 
     steps:
@@ -29,6 +30,20 @@ jobs:
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes" \
             www/ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/www/vabch.org/plot/
+
+      - name: Rsync migrations to server
+        run: |
+          rsync -rlv --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes" \
+            packages/db/migrations/ \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/plothole/migrations/
+
+      - name: Run migrations
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=yes \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "bash /opt/plothole/migrate.sh"
 
       - name: Clean up key
         if: always()

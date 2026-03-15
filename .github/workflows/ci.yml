@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  ci:
+  lint-typecheck-test:
     name: Lint, typecheck, test
     runs-on: ubuntu-latest
 
@@ -33,3 +33,49 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+  migration-test:
+    name: Migration smoke test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:15-3.4
+        env:
+          POSTGRES_USER: plothole
+          POSTGRES_PASSWORD: plothole
+          POSTGRES_DB: plothole
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://plothole:plothole@localhost:5432/plothole
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Run migrations
+        run: pnpm db:migrate
+
+      - name: Verify schema
+        run: |
+          # Confirm DB is reachable and tracking table was created by the runner.
+          # Deeper checks (hazards table, PostGIS version) are added once
+          # Phase 1 SQL migrations land in packages/db/migrations/.
+          psql "$DATABASE_URL" -c "SELECT COUNT(*) FROM _migrations;"
