@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import Image from "next/image";
+import { useRef, useState, useCallback } from "react";
 
 const STEPS = [
   { n: 1, label: "Photo" },
@@ -9,8 +13,51 @@ const STEPS = [
 
 const HAZARD_TYPES = ["Pothole", "Cave-in", "Depression", "Ditch/Trench", "Push-up", "Other"];
 
+interface GpsCoords { lat: number; lng: number; locality?: string }
+
 export default function ReportPage() {
-  const activeStep = 2;
+  const [activeStep] = useState(2);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [gps, setGps] = useState<GpsCoords | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [hazardType, setHazardType] = useState("Pothole");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = useCallback(async (file: File) => {
+    if (!file.type.startsWith("image/")) return;
+
+    // Show preview
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+
+    // Extract GPS from EXIF
+    try {
+      const { default: exifr } = await import("exifr");
+      const result = await exifr.gps(file);
+      if (result?.latitude && result?.longitude) {
+        setGps({ lat: result.latitude, lng: result.longitude });
+      } else {
+        setGps(null);
+      }
+    } catch {
+      setGps(null);
+    }
+  }, []);
+
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFile(file);
+  };
+
+  const onDragOver = (e: React.DragEvent) => { e.preventDefault(); setDragging(true); };
+  const onDragLeave = () => setDragging(false);
 
   return (
     <div className="min-h-[calc(100vh-56px)] bg-[#171717]">
@@ -52,24 +99,69 @@ export default function ReportPage() {
               <label className="block text-sm text-[#9ca3af] mb-2">
                 Photo <span className="text-[#e5521e]">*</span>
               </label>
-              <div className="border-2 border-dashed border-[#444] rounded-xl p-10 flex flex-col
-                              items-center justify-center gap-3 bg-[#1e1e1e] cursor-pointer
-                              hover:border-[#e5521e]/50 hover:bg-[#222] transition-colors">
-                <CameraIcon />
-                <div className="text-center">
-                  <p className="text-[#f5f5f5] text-sm font-medium">Drag & drop or click to upload</p>
-                  <p className="text-xs text-[#6b7280] mt-1">JPG, PNG — GPS EXIF required</p>
-                </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={onInputChange}
+              />
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+                className={`border-2 border-dashed rounded-xl flex flex-col items-center justify-center
+                            cursor-pointer transition-colors overflow-hidden
+                            ${dragging
+                              ? "border-[#e5521e] bg-[#e5521e]/5"
+                              : preview
+                                ? "border-[#444] p-0"
+                                : "border-[#444] p-10 gap-3 bg-[#1e1e1e] hover:border-[#e5521e]/50 hover:bg-[#222]"}`}
+              >
+                {preview ? (
+                  <div className="relative w-full h-52">
+                    <Image src={preview} alt="Upload preview" fill className="object-cover rounded-xl" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity
+                                    rounded-xl flex items-center justify-center">
+                      <span className="text-sm text-white font-medium">Click to change</span>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <CameraIcon />
+                    <div className="text-center">
+                      <p className="text-[#f5f5f5] text-sm font-medium">Drag & drop or click to upload</p>
+                      <p className="text-xs text-[#6b7280] mt-1">JPG, PNG — GPS EXIF preferred</p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
-            {/* GPS extracted */}
-            <div className="flex items-center gap-2.5 bg-[#1a2e1a] border border-emerald-800/40 rounded-lg px-3 py-2.5">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
-              <span className="text-xs text-emerald-400 font-medium">
-                GPS extracted: 39.9458°N, 75.1734°W — South Philadelphia
-              </span>
-            </div>
+            {/* GPS status */}
+            {preview && (
+              <div className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 border
+                ${gps
+                  ? "bg-[#1a2e1a] border-emerald-800/40"
+                  : "bg-[#2a1a1a] border-red-900/40"}`}>
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${gps ? "bg-emerald-500" : "bg-red-500"}`} />
+                <span className={`text-xs font-medium ${gps ? "text-emerald-400" : "text-red-400"}`}>
+                  {gps
+                    ? `GPS extracted: ${gps.lat.toFixed(4)}°N, ${Math.abs(gps.lng).toFixed(4)}°W`
+                    : "No GPS data in photo — pin location manually below"}
+                </span>
+              </div>
+            )}
+
+            {!preview && (
+              <div className="flex items-center gap-2.5 bg-[#1a2e1a] border border-emerald-800/40 rounded-lg px-3 py-2.5">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                <span className="text-xs text-emerald-400 font-medium">
+                  GPS will be extracted from photo EXIF automatically
+                </span>
+              </div>
+            )}
 
             {/* Mini-map pin */}
             <div>
@@ -83,7 +175,11 @@ export default function ReportPage() {
                   <div className="w-3 h-3 rounded-full bg-[#e5521e] ring-2 ring-[#e5521e]/30" />
                 </div>
               </div>
-              <p className="text-xs text-[#6b7280] mt-1.5">1200 Arch St, Philadelphia, PA — auto-detected</p>
+              <p className="text-xs text-[#6b7280] mt-1.5">
+                {gps
+                  ? `${gps.lat.toFixed(4)}°N, ${Math.abs(gps.lng).toFixed(4)}°W — from photo`
+                  : "Pin location manually on the map"}
+              </p>
             </div>
           </div>
 
@@ -108,11 +204,15 @@ export default function ReportPage() {
                 Hazard type <span className="text-[#e5521e]">*</span>
               </label>
               <div className="grid grid-cols-3 gap-2">
-                {HAZARD_TYPES.map((type, i) => (
-                  <button key={type} className={`p-3 rounded-lg text-xs font-medium border text-center
-                    transition-colors ${i === 0
-                      ? "bg-[#e5521e]/15 border-[#e5521e] text-[#e5521e]"
-                      : "bg-[#222] border-[#333] text-[#9ca3af] hover:border-[#555]"}`}>
+                {HAZARD_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setHazardType(type)}
+                    className={`p-3 rounded-lg text-xs font-medium border text-center transition-colors
+                      ${hazardType === type
+                        ? "bg-[#e5521e]/15 border-[#e5521e] text-[#e5521e]"
+                        : "bg-[#222] border-[#333] text-[#9ca3af] hover:border-[#555]"}`}
+                  >
                     {type}
                   </button>
                 ))}

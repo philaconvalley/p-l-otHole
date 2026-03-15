@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function AuthPage() {
   return (
@@ -55,9 +56,9 @@ export default function AuthPage() {
             <div className="flex-1 h-px bg-[#2a2a2a]" />
           </div>
 
-          <button className="w-full py-2.5 text-sm font-medium text-[#9ca3af] hover:text-white transition-colors">
+          <Link href="/" className="block w-full py-2.5 text-sm font-medium text-[#9ca3af] hover:text-white transition-colors text-center">
             Browse map as guest →
-          </button>
+          </Link>
         </div>
       </div>
     </div>

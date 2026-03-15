@@ -1,3 +1,5 @@
+"use client";
+
 const EXPORT_FORMATS = [
   {
     icon: "🗺",
@@ -87,15 +89,19 @@ export default function ExportPage() {
                 </div>
                 <p className="text-xs text-[#9ca3af] leading-relaxed">{description}</p>
               </div>
-              <button
-                className={`px-4 py-2 text-xs font-semibold rounded-lg border flex-shrink-0 transition-colors
-                  ${endpoint
-                    ? "bg-[#e5521e] text-white border-[#e5521e] hover:bg-[#cc4418]"
-                    : "text-[#6b7280] border-[#333] bg-[#1e1e1e] cursor-not-allowed"}`}
-                disabled={!endpoint}
-              >
-                {endpoint ? "Download" : "Coming soon"}
-              </button>
+              {endpoint ? (
+                <a
+                  href={endpoint}
+                  download
+                  className="px-4 py-2 text-xs font-semibold rounded-lg border flex-shrink-0 transition-colors bg-[#e5521e] text-white border-[#e5521e] hover:bg-[#cc4418]"
+                >
+                  Download
+                </a>
+              ) : (
+                <button disabled className="px-4 py-2 text-xs font-semibold rounded-lg border flex-shrink-0 text-[#6b7280] border-[#333] bg-[#1e1e1e] cursor-not-allowed">
+                  Coming soon
+                </button>
+              )}
             </div>
           ))}
         </div>
