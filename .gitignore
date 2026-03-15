@@ -25,5 +25,8 @@ pnpm-debug.log*
 # TypeScript incremental cache
 *.tsbuildinfo
 
+# Next.js generated files (not committed)
+apps/web/next-env.d.ts
+
 # Vercel
 .vercel/
