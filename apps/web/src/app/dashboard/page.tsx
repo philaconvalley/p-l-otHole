@@ -4,15 +4,25 @@ import { SeverityBadge } from "@/components/severity-badge";
 import { db } from "@/lib/db";
 import { statusLabel, severityLabel } from "@/lib/format";
 
+const REPAIR_STATUSES = ["reported", "acknowledged", "scheduled", "in_progress", "resolved"] as const;
+
 async function getStats() {
-  const [total, resolved, statusRows, topHazards, openHazards] = await Promise.all([
+  // Use individual counts instead of groupBy — groupBy has known issues
+  // with Prisma's @prisma/adapter-pg driver adapter
+  const [total, resolved, ...statusCounts] = await Promise.all([
     db.hazard.count({ where: { deletedAt: null } }),
     db.hazard.count({ where: { deletedAt: null, repairStatus: "resolved" } }),
-    db.hazard.groupBy({
-      by: ["repairStatus"],
-      where: { deletedAt: null },
-      _count: { _all: true },
-    }),
+    ...REPAIR_STATUSES.map(s =>
+      db.hazard.count({ where: { deletedAt: null, repairStatus: s } })
+    ),
+  ]);
+
+  const statusRows = REPAIR_STATUSES.map((key, i) => ({
+    repairStatus: key,
+    count: statusCounts[i] ?? 0,
+  }));
+
+  const [topHazards, openHazards] = await Promise.all([
     db.hazard.findMany({
       where: { deletedAt: null, repairStatus: { not: "resolved" } },
       orderBy: [{ upvotes: "desc" }],
@@ -38,11 +48,10 @@ async function getStats() {
 export default async function DashboardPage() {
   const { open, critical, avgDaysOpen, statusRows, topHazards } = await getStats();
 
-  const STATUS_ORDER = ["reported", "acknowledged", "scheduled", "in_progress", "resolved"];
-  const maxCount = Math.max(...statusRows.map(r => r._count._all), 1);
-  const statusData = STATUS_ORDER.map(key => ({
+  const maxCount = Math.max(...statusRows.map(r => r.count), 1);
+  const statusData = statusRows.map(({ repairStatus: key, count }) => ({
     label: statusLabel(key),
-    count: statusRows.find(r => r.repairStatus === key)?._count._all ?? 0,
+    count,
     cls:
       key === "reported"     ? "bg-[#F99300]" :
       key === "acknowledged" ? "bg-[#f97316]" :
