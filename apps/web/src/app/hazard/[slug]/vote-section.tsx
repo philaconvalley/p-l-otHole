@@ -3,10 +3,10 @@
 import { useState } from "react";
 
 const SEVERITY_VOTES = [
-  { label: "Low",      value: 1 },
-  { label: "Moderate", value: 2 },
-  { label: "High",     value: 4 },
-  { label: "Critical", value: 5 },
+  { label: "Low",      value: 1, active: "bg-emerald-500/20 border-emerald-500/50 text-emerald-400", hover: "hover:border-emerald-500/40 hover:text-emerald-400" },
+  { label: "Moderate", value: 2, active: "bg-amber-500/20 border-amber-500/50 text-amber-400",     hover: "hover:border-amber-500/40 hover:text-amber-400"   },
+  { label: "High",     value: 4, active: "bg-orange-500/20 border-orange-500/50 text-orange-400",  hover: "hover:border-orange-500/40 hover:text-orange-400" },
+  { label: "Critical", value: 5, active: "bg-red-500/20 border-red-500/50 text-red-400",           hover: "hover:border-red-500/40 hover:text-red-400"       },
 ];
 
 interface VoteSectionProps {
@@ -59,17 +59,15 @@ export function VoteSection({ hazardId, upvotes: initialUp, severityScore }: Vot
     <div className="bg-[#222] border border-[#333] rounded-xl p-5">
       <p className="text-sm font-semibold text-[#f5f5f5] mb-4">Vote severity</p>
       <div className="flex flex-wrap gap-2 mb-2">
-        {SEVERITY_VOTES.map(({ label, value }) => (
+        {SEVERITY_VOTES.map(({ label, value, active, hover }) => (
           <button
             key={label}
             onClick={() => castVote(value)}
             disabled={pending}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors
               ${voted === value
-                ? value >= 4
-                  ? "bg-red-500/20 border-red-500/50 text-red-400"
-                  : "bg-[#e5521e]/20 border-[#e5521e]/50 text-[#e5521e]"
-                : "bg-[#2a2a2a] border-[#444] text-[#9ca3af] hover:border-[#888]"}
+                ? active
+                : `bg-[#2a2a2a] border-[#444] text-[#9ca3af] ${hover}`}
               ${pending ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             {label}
