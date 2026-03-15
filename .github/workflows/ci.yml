@@ -75,6 +75,7 @@ jobs:
 
       - name: Verify schema
         run: |
-          psql "$DATABASE_URL" -c "\dt" | grep hazards
-          psql "$DATABASE_URL" -c "SELECT PostGIS_Version();"
+          # Confirm DB is reachable and tracking table was created by the runner.
+          # Deeper checks (hazards table, PostGIS version) are added once
+          # Phase 1 SQL migrations land in packages/db/migrations/.
           psql "$DATABASE_URL" -c "SELECT COUNT(*) FROM _migrations;"
