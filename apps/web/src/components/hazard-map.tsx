@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Map, { Marker, Popup, NavigationControl, Source, Layer } from "react-map-gl";
-import type { HeatmapLayer, CircleLayer, SymbolLayer } from "react-map-gl";
+import type { LayerProps } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { severityLabel } from "@/lib/format";
 
@@ -24,7 +24,7 @@ const SEVERITY_COLORS: Record<string, string> = {
   low:      "#10b981",
 };
 
-const heatmapLayer: HeatmapLayer = {
+const heatmapLayer: LayerProps = {
   id: "hazard-heat",
   type: "heatmap",
   paint: {
@@ -43,7 +43,7 @@ const heatmapLayer: HeatmapLayer = {
   },
 };
 
-const clusterCircleLayer: CircleLayer = {
+const clusterCircleLayer: LayerProps = {
   id: "clusters",
   type: "circle",
   filter: ["has", "point_count"],
@@ -56,7 +56,7 @@ const clusterCircleLayer: CircleLayer = {
   },
 };
 
-const clusterCountLayer: SymbolLayer = {
+const clusterCountLayer: LayerProps = {
   id: "cluster-count",
   type: "symbol",
   filter: ["has", "point_count"],
@@ -68,7 +68,7 @@ const clusterCountLayer: SymbolLayer = {
   paint: { "text-color": "#fff" },
 };
 
-const unclusteredLayer: CircleLayer = {
+const unclusteredLayer: LayerProps = {
   id: "unclustered-point",
   type: "circle",
   filter: ["!", ["has", "point_count"]],

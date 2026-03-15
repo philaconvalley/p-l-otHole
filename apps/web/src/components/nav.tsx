@@ -6,12 +6,11 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import type { Route } from "next";
 
-const NAV_LINKS = [
+const STATIC_NAV_LINKS = [
   { href: "/", label: "Map" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/dashboard", label: "Civic dashboard" },
   { href: "/export", label: "Export" },
-  { href: "/profile/me", label: "Profile" },
 ];
 
 export function Nav() {
@@ -27,7 +26,10 @@ export function Nav() {
 
       {/* Nav links */}
       <nav className="hidden md:flex items-center gap-1 flex-1">
-        {NAV_LINKS.map((link) => {
+        {[
+          ...STATIC_NAV_LINKS,
+          ...(session?.user ? [{ href: `/profile/${session.user.name}`, label: "Profile" }] : []),
+        ].map((link) => {
           const isActive =
             link.href === "/"
               ? pathname === "/"
