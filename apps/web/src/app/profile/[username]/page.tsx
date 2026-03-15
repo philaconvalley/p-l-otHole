@@ -34,9 +34,9 @@ export default function ProfilePage({
         <aside className="md:w-64 flex-shrink-0 space-y-4">
           {/* Avatar + name */}
           <div className="bg-[#222] border border-[#333] rounded-xl p-5 flex flex-col items-center text-center">
-            <div className="w-20 h-20 rounded-full bg-[#e5521e]/20 border-2 border-[#e5521e]/50
+            <div className="w-20 h-20 rounded-full bg-[#F99300]/20 border-2 border-[#F99300]/50
                             flex items-center justify-center mb-3">
-              <span className="text-2xl font-bold text-[#e5521e]">{initials}</span>
+              <span className="text-2xl font-bold text-[#F99300]">{initials}</span>
             </div>
             <h1 className="text-lg font-bold text-[#f5f5f5]">{displayName}</h1>
             <p className="text-xs text-[#6b7280] mt-0.5">@{params.username}</p>
@@ -49,7 +49,7 @@ export default function ProfilePage({
           <div className="bg-[#222] border border-[#333] rounded-xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs text-[#6b7280] uppercase tracking-widest font-semibold">Rank</span>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#e5521e]/15 text-[#e5521e] border border-[#e5521e]/30">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F99300]/15 text-[#F99300] border border-[#F99300]/30">
                 Civic Scout
               </span>
             </div>
@@ -59,7 +59,7 @@ export default function ProfilePage({
                 <span className="text-xs font-mono text-[#f5f5f5]">1,240 / 2,000</span>
               </div>
               <div className="h-2 bg-[#2a2a2a] rounded-full overflow-hidden">
-                <div className="h-full bg-[#e5521e] rounded-full" style={{ width: "62%" }} />
+                <div className="h-full bg-[#F99300] rounded-full" style={{ width: "62%" }} />
               </div>
               <p className="text-[10px] text-[#4b5563] mt-1">760 pts to City Guardian</p>
             </div>

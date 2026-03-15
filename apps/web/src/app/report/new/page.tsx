@@ -117,18 +117,18 @@ export default function ReportPage() {
               <div key={step.n} className="flex items-center gap-2">
                 <div className="flex items-center gap-2">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2
-                    ${step.n < activeStep  ? "bg-[#e5521e] border-[#e5521e] text-white" :
-                      step.n === activeStep ? "bg-transparent border-[#e5521e] text-[#e5521e]" :
+                    ${step.n < activeStep  ? "bg-[#F99300] border-[#F99300] text-white" :
+                      step.n === activeStep ? "bg-transparent border-[#F99300] text-[#F99300]" :
                                              "bg-transparent border-[#444] text-[#6b7280]"}`}>
                     {step.n < activeStep ? "✓" : step.n}
                   </div>
                   <span className={`text-sm font-medium hidden sm:block
-                    ${step.n === activeStep ? "text-[#e5521e]" : step.n < activeStep ? "text-[#9ca3af]" : "text-[#4b5563]"}`}>
+                    ${step.n === activeStep ? "text-[#F99300]" : step.n < activeStep ? "text-[#9ca3af]" : "text-[#4b5563]"}`}>
                     {step.label}
                   </span>
                 </div>
                 {i < STEPS.length - 1 && (
-                  <div className={`h-px w-8 mx-1 ${step.n < activeStep ? "bg-[#e5521e]" : "bg-[#333]"}`} />
+                  <div className={`h-px w-8 mx-1 ${step.n < activeStep ? "bg-[#F99300]" : "bg-[#333]"}`} />
                 )}
               </div>
             ))}
@@ -145,7 +145,7 @@ export default function ReportPage() {
             {/* Photo upload */}
             <div>
               <label className="block text-sm text-[#9ca3af] mb-2">
-                Photo <span className="text-[#e5521e]">*</span>
+                Photo <span className="text-[#F99300]">*</span>
               </label>
               <input
                 ref={fileInputRef}
@@ -162,10 +162,10 @@ export default function ReportPage() {
                 className={`border-2 border-dashed rounded-xl flex flex-col items-center justify-center
                             cursor-pointer transition-colors overflow-hidden
                             ${dragging
-                              ? "border-[#e5521e] bg-[#e5521e]/5"
+                              ? "border-[#F99300] bg-[#F99300]/5"
                               : preview
                                 ? "border-[#444] p-0"
-                                : "border-[#444] p-10 gap-3 bg-[#1e1e1e] hover:border-[#e5521e]/50 hover:bg-[#222]"}`}
+                                : "border-[#444] p-10 gap-3 bg-[#1e1e1e] hover:border-[#F99300]/50 hover:bg-[#222]"}`}
               >
                 {preview ? (
                   <div className="relative w-full h-52">
@@ -220,7 +220,7 @@ export default function ReportPage() {
                                 flex flex-col items-center gap-1">
                   <div className="bg-[#222] border border-[#444] rounded px-2 py-0.5 text-xs
                                   text-[#9ca3af] whitespace-nowrap">Drag to adjust</div>
-                  <div className="w-3 h-3 rounded-full bg-[#e5521e] ring-2 ring-[#e5521e]/30" />
+                  <div className="w-3 h-3 rounded-full bg-[#F99300] ring-2 ring-[#F99300]/30" />
                 </div>
               </div>
               <p className="text-xs text-[#6b7280] mt-1.5">
@@ -236,7 +236,7 @@ export default function ReportPage() {
             {/* Community name */}
             <div>
               <label className="block text-sm text-[#9ca3af] mb-2">
-                Community name <span className="text-[#e5521e]">*</span>
+                Community name <span className="text-[#F99300]">*</span>
               </label>
               <input
                 type="text"
@@ -251,7 +251,7 @@ export default function ReportPage() {
             {/* Hazard type */}
             <div>
               <label className="block text-sm text-[#9ca3af] mb-2">
-                Hazard type <span className="text-[#e5521e]">*</span>
+                Hazard type <span className="text-[#F99300]">*</span>
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {HAZARD_TYPES.map((type) => (
@@ -260,7 +260,7 @@ export default function ReportPage() {
                     onClick={() => setHazardType(type)}
                     className={`p-3 rounded-lg text-xs font-medium border text-center transition-colors
                       ${hazardType === type
-                        ? "bg-[#e5521e]/15 border-[#e5521e] text-[#e5521e]"
+                        ? "bg-[#F99300]/15 border-[#F99300] text-[#F99300]"
                         : "bg-[#222] border-[#333] text-[#9ca3af] hover:border-[#555]"}`}
                   >
                     {type}
@@ -302,8 +302,8 @@ export default function ReportPage() {
             type="submit"
             onClick={handleSubmit}
             disabled={submitting}
-            className={`px-6 py-2 text-sm font-semibold text-white bg-[#e5521e] rounded-full flex items-center gap-2 transition-colors
-              ${submitting ? "opacity-60 cursor-not-allowed" : "hover:bg-[#cc4418]"}`}
+            className={`px-6 py-2 text-sm font-semibold text-white bg-[#F99300] rounded-full flex items-center gap-2 transition-colors
+              ${submitting ? "opacity-60 cursor-not-allowed" : "hover:bg-[#e07e00]"}`}
           >
             {submitting ? "Submitting…" : <>Submit report <span>→</span></>}
           </button>

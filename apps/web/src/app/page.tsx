@@ -1,8 +1,22 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { HazardCard } from "@/components/hazard-card";
 import { severityLabel, statusLabel, typeLabel, daysAgo } from "@/lib/format";
+import type { MapHazard } from "@/components/hazard-map";
+
+const HazardMap = dynamic(
+  () => import("@/components/hazard-map").then(m => m.HazardMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full bg-[#1a1a1a] map-grid flex items-center justify-center">
+        <span className="text-[#444] text-sm">Loading map…</span>
+      </div>
+    ),
+  }
+);
 
 interface ApiHazard {
   id: string;
@@ -11,6 +25,7 @@ interface ApiHazard {
   type: string;
   severityScore: number;
   votes: { up: number; down: number };
+  location: { latitude: number; longitude: number };
   reportsCount: number;
   repairStatus: string;
   createdAt: string;
@@ -86,6 +101,17 @@ export default function MapPage() {
     type: typeLabel(h.type),
   }));
 
+  const mapHazards: MapHazard[] = visible.map(h => ({
+    id: h.id,
+    slug: h.slug ?? h.id,
+    name: h.name ?? "Unnamed hazard",
+    severityScore: h.severityScore,
+    votes: h.votes,
+    location: h.location,
+    repairStatus: h.repairStatus,
+    type: h.type,
+  }));
+
   return (
     <div className="flex h-[calc(100vh-56px)] overflow-hidden">
 
@@ -100,7 +126,7 @@ export default function MapPage() {
               onChange={e => setSearch(e.target.value)}
               placeholder="Search hazards..."
               className="w-full pl-8 pr-3 py-2 text-xs bg-[#222] border border-[#333]
-                         rounded-lg placeholder-[#4b5563] focus:border-[#e5521e] outline-none"
+                         rounded-lg placeholder-[#4b5563] focus:border-[#F99300] outline-none"
             />
           </div>
         </div>
@@ -110,7 +136,7 @@ export default function MapPage() {
             {["All", "Critical", "High"].map(f => (
               <button key={f} onClick={() => setSeverityFilter(f)}
                 className={`px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors
-                  ${severityFilter === f ? "bg-[#e5521e] text-white border-[#e5521e]" : "text-[#9ca3af] border-[#444] hover:border-[#888]"}`}>
+                  ${severityFilter === f ? "bg-[#F99300] text-white border-[#F99300]" : "text-[#9ca3af] border-[#444] hover:border-[#888]"}`}>
                 {f}
               </button>
             ))}
@@ -119,7 +145,7 @@ export default function MapPage() {
             {["Open", "Resolved"].map(f => (
               <button key={f} onClick={() => setStatusFilter(f)}
                 className={`px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors
-                  ${statusFilter === f ? "bg-[#e5521e] text-white border-[#e5521e]" : "text-[#9ca3af] border-[#444] hover:border-[#888]"}`}>
+                  ${statusFilter === f ? "bg-[#F99300] text-white border-[#F99300]" : "text-[#9ca3af] border-[#444] hover:border-[#888]"}`}>
                 {f}
               </button>
             ))}
@@ -169,20 +195,9 @@ export default function MapPage() {
       </aside>
 
       {/* ── Map center ──────────────────────────────────────── */}
-      <main className="flex-1 relative overflow-hidden bg-[#1a1a1a] map-grid">
-        <div className="absolute top-[28%] left-[35%] w-9 h-9 rounded-full bg-[#e5521e] text-white text-sm font-bold flex items-center justify-center shadow-lg shadow-orange-900/40 cursor-pointer">5</div>
-        <div className="absolute top-[45%] left-[22%] w-9 h-9 rounded-full bg-[#e5521e] text-white text-sm font-bold flex items-center justify-center shadow-lg shadow-orange-900/40 cursor-pointer">7</div>
-        <div className="absolute top-[60%] left-[58%] w-8 h-8 rounded-full bg-[#2a2a2a] border-2 border-[#d97706] text-[#d97706] text-xs font-bold flex items-center justify-center cursor-pointer">3</div>
-        <div className="absolute top-[65%] right-[25%] w-8 h-8 rounded-full bg-[#2a2a2a] border-2 border-[#6b7280] text-[#9ca3af] text-xs font-bold flex items-center justify-center cursor-pointer">2</div>
-        <div className="absolute top-[38%] left-[48%] flex flex-col items-center cursor-pointer">
-          <div className="bg-[#222] border border-[#444] rounded px-2 py-0.5 text-xs text-[#f5f5f5] whitespace-nowrap mb-1 shadow-lg">The Abyss on 5th</div>
-          <div className="w-3 h-3 rounded-full bg-[#e5521e] ring-2 ring-[#e5521e]/30" />
-        </div>
-        <div className="absolute top-4 left-4 flex flex-col gap-1">
-          <button className="w-8 h-8 bg-[#222] border border-[#444] rounded flex items-center justify-center text-white hover:bg-[#2a2a2a] font-light text-lg">+</button>
-          <button className="w-8 h-8 bg-[#222] border border-[#444] rounded flex items-center justify-center text-white hover:bg-[#2a2a2a] font-light text-xl leading-none">−</button>
-        </div>
-        <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-[#222]/90 border border-[#444] rounded-full text-xs text-[#9ca3af] font-mono">
+      <main className="flex-1 relative overflow-hidden">
+        <HazardMap hazards={mapHazards} />
+        <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-[#222]/90 border border-[#444] rounded-full text-xs text-[#9ca3af] font-mono pointer-events-none">
           {loading ? "Loading…" : `${visible.length} hazards shown`}
         </div>
       </main>
@@ -194,7 +209,7 @@ export default function MapPage() {
           <div className="flex flex-wrap gap-1.5">
             {[severityFilter, statusFilter, ...Array.from(activeSeverities)]
               .filter((f, i, a) => f && a.indexOf(f) === i)
-              .map(f => <span key={f} className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#e5521e] text-white">{f}</span>)}
+              .map(f => <span key={f} className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#F99300] text-white">{f}</span>)}
           </div>
         </div>
 

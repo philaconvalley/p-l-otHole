@@ -93,7 +93,7 @@ export default function ExportPage() {
                 <a
                   href={endpoint}
                   download
-                  className="px-4 py-2 text-xs font-semibold rounded-lg border flex-shrink-0 transition-colors bg-[#e5521e] text-white border-[#e5521e] hover:bg-[#cc4418]"
+                  className="px-4 py-2 text-xs font-semibold rounded-lg border flex-shrink-0 transition-colors bg-[#F99300] text-white border-[#F99300] hover:bg-[#e07e00]"
                 >
                   Download
                 </a>
@@ -110,7 +110,7 @@ export default function ExportPage() {
         <div className="bg-[#1e1e1e] border border-[#2a2a2a] rounded-lg p-4 text-xs text-[#6b7280]">
           <span className="font-semibold text-[#9ca3af]">Note: </span>
           Exports are limited to 10,000 records. For bulk data access, contact the city data team or use the API directly at{" "}
-          <code className="text-[#e5521e] font-mono">/api/v1/hazards</code>.
+          <code className="text-[#F99300] font-mono">/api/v1/hazards</code>.
         </div>
       </div>
     </div>

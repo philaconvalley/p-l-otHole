@@ -40,6 +40,12 @@ jobs:
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/plothole/app/
 
+      - name: Write build-time env on server
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "echo 'NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.MAPBOX_TOKEN }}' > /opt/plothole/app/apps/web/.env.production.local"
+
       - name: Build and restart container
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \

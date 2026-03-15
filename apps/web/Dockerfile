@@ -12,6 +12,8 @@ COPY . .
 RUN echo "node-linker=hoisted" >> .npmrc
 RUN pnpm install --no-frozen-lockfile
 ENV DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder
+# NEXT_PUBLIC_MAPBOX_TOKEN is written to apps/web/.env.production.local on the server
+# by the deploy workflow (from the MAPBOX_TOKEN GitHub secret) before docker build runs.
 RUN pnpm --filter web db:generate
 RUN pnpm --filter web build
 

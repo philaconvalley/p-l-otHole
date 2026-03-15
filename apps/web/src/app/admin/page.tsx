@@ -30,14 +30,14 @@ export default function AdminPage() {
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
                           transition-colors text-left
                           ${active
-                            ? "bg-[#e5521e]/15 text-[#e5521e] border border-[#e5521e]/20"
+                            ? "bg-[#F99300]/15 text-[#F99300] border border-[#F99300]/20"
                             : "text-[#9ca3af] hover:bg-[#2a2a2a] hover:text-white"}`}
             >
               <span className="text-base">{icon}</span>
               <span className="flex-1 font-medium">{label}</span>
               {badge > 0 && (
                 <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center
-                  ${active ? "bg-[#e5521e] text-white" : "bg-[#333] text-[#9ca3af]"}`}>
+                  ${active ? "bg-[#F99300] text-white" : "bg-[#333] text-[#9ca3af]"}`}>
                   {badge}
                 </span>
               )}
@@ -57,7 +57,7 @@ export default function AdminPage() {
                 key={tab}
                 className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors
                   ${i === 0
-                    ? "bg-[#e5521e] text-white border-[#e5521e]"
+                    ? "bg-[#F99300] text-white border-[#F99300]"
                     : "text-[#9ca3af] border-[#444] hover:border-[#888] hover:text-white"}`}
               >
                 {tab}
