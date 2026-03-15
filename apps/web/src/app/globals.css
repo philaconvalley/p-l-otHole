@@ -1,0 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* mapbox-gl baseline */
+@import "mapbox-gl/dist/mapbox-gl.css";
