@@ -32,7 +32,7 @@ async function migrate() {
     const query = await readFile(join(MIGRATIONS_DIR, file), "utf8");
     await sql.begin(async (tx) => {
       await tx.unsafe(query);
-      await tx`INSERT INTO _migrations (filename) VALUES (${file})`;
+      await tx.unsafe("INSERT INTO _migrations (filename) VALUES ($1)", [file]);
     });
     console.log(`  apply ${file}`);
   }
