@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import type { Route } from "next";
 
 const NAV_LINKS = [
@@ -15,6 +16,7 @@ const NAV_LINKS = [
 
 export function Nav() {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-[#171717] border-b border-[#2a2a2a] flex items-center px-6 gap-8">
@@ -53,13 +55,30 @@ export function Nav() {
 
       {/* Actions */}
       <div className="flex items-center gap-3 flex-shrink-0 ml-auto md:ml-0">
-        <Link
-          href="/auth"
-          className="hidden sm:inline-flex px-4 py-1.5 text-sm font-medium text-[#f5f5f5]
-                     border border-[#444] rounded-full hover:border-[#888] transition-colors duration-150"
-        >
-          Log in
-        </Link>
+        {status === "loading" ? (
+          <div className="h-8 w-20 bg-[#2a2a2a] rounded-full animate-pulse" />
+        ) : session?.user ? (
+          <div className="flex items-center gap-3">
+            <span className="hidden sm:inline text-sm text-[#9ca3af]">
+              {session.user.name}
+            </span>
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="hidden sm:inline-flex px-4 py-1.5 text-sm font-medium text-[#f5f5f5]
+                       border border-[#444] rounded-full hover:border-[#888] transition-colors duration-150"
+            >
+              Sign out
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/auth"
+            className="hidden sm:inline-flex px-4 py-1.5 text-sm font-medium text-[#f5f5f5]
+                       border border-[#444] rounded-full hover:border-[#888] transition-colors duration-150"
+          >
+            Log in
+          </Link>
+        )}
         <Link
           href="/report/new"
           className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-semibold
