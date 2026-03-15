@@ -6,12 +6,11 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import type { Route } from "next";
 
-const NAV_LINKS = [
+const STATIC_NAV_LINKS = [
   { href: "/", label: "Map" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/dashboard", label: "Civic dashboard" },
   { href: "/export", label: "Export" },
-  { href: "/profile/me", label: "Profile" },
 ];
 
 export function Nav() {
@@ -27,7 +26,10 @@ export function Nav() {
 
       {/* Nav links */}
       <nav className="hidden md:flex items-center gap-1 flex-1">
-        {NAV_LINKS.map((link) => {
+        {[
+          ...STATIC_NAV_LINKS,
+          ...(session?.user ? [{ href: `/profile/${session.user.name}`, label: "Profile" }] : []),
+        ].map((link) => {
           const isActive =
             link.href === "/"
               ? pathname === "/"
@@ -59,6 +61,17 @@ export function Nav() {
           <div className="h-8 w-20 bg-[#2a2a2a] rounded-full animate-pulse" />
         ) : session?.user ? (
           <div className="flex items-center gap-3">
+            {session.user.isModerator && (
+              <Link
+                href="/admin"
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors
+                  ${pathname.startsWith("/admin")
+                    ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                    : "text-purple-400/70 hover:text-purple-400 border border-transparent hover:border-purple-500/30"}`}
+              >
+                Admin
+              </Link>
+            )}
             <span className="hidden sm:inline text-sm text-[#9ca3af]">
               {session.user.name}
             </span>

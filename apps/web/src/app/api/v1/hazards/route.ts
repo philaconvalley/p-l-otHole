@@ -35,6 +35,16 @@ export async function GET(request: NextRequest) {
     if (query.city) {
       where.cityCode = query.city;
     }
+    if (query.severity) {
+      const scoreMin = query.severity === "critical" ? 60
+        : query.severity === "high"     ? 30
+        : query.severity === "moderate" ? 8
+        : 0;
+      const scoreMax = query.severity === "low" ? 7 : undefined;
+      where.severityScore = scoreMax !== undefined
+        ? { gte: scoreMin, lte: scoreMax }
+        : { gte: scoreMin };
+    }
 
     // Build order by
     let orderBy: Prisma.HazardOrderByWithRelationInput;

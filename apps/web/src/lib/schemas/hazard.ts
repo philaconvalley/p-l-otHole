@@ -84,6 +84,7 @@ export const listHazardsQuerySchema = z.object({
   sort: z
     .enum(["newest", "oldest", "severity", "most_voted"])
     .default("newest"),
+  severity: z.enum(["critical", "high", "moderate", "low"]).optional(),
 });
 
 // Search hazards query params (radius search)
