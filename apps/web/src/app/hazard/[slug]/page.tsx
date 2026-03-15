@@ -37,7 +37,7 @@ export default function HazardDetailPage({
           {/* Name + badges */}
           <div>
             <h1 className="text-2xl font-bold text-[#f5f5f5] mb-3 leading-tight">
-              &ldquo;{params.slug.split("-").map(w => w[0].toUpperCase() + w.slice(1)).join(" ")}&rdquo;
+              &ldquo;{params.slug.split("-").map(w => (w[0]?.toUpperCase() ?? "") + w.slice(1)).join(" ")}&rdquo;
             </h1>
             <div className="flex items-center gap-2 mb-3">
               <SeverityBadge severity="critical" />
