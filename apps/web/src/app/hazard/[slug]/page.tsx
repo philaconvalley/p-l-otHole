@@ -162,9 +162,9 @@ export default async function HazardDetailPage({
           {/* Photo + mini-map */}
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-2 bg-[#222] border border-[#333] rounded-xl h-56 flex items-center justify-center">
-              {hazard.images && hazard.images.length > 0 ? (
+              {Array.isArray(hazard.images) && hazard.images.length > 0 ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={hazard.images[0]} alt={hazard.name ?? ""} className="w-full h-full object-cover rounded-xl" />
+                <img src={String(hazard.images[0])} alt={hazard.name ?? ""} className="w-full h-full object-cover rounded-xl" />
               ) : (
                 <div className="text-center text-[#444]">
                   <div className="text-3xl mb-2">📸</div>

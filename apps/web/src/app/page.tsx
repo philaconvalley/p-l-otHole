@@ -133,7 +133,7 @@ export default function MapPage() {
               <div key={label} onClick={() => toggleSeverity(label)}
                 className={`flex items-center justify-between cursor-pointer rounded px-1 py-0.5 transition-colors
                   ${activeSeverities.has(label) ? "bg-[#2a2a2a]" : "hover:bg-[#222]"}`}>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${SEVERITY_COUNTS[i].cls}
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${SEVERITY_COUNTS[i]?.cls ?? ""}
                   ${activeSeverities.has(label) ? "ring-1 ring-current" : ""}`}>{label}</span>
                 <span className="text-xs text-[#6b7280] font-mono">{count}</span>
               </div>
