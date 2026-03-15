@@ -10,6 +10,10 @@ on:
       - ".dockerignore"
   workflow_dispatch:
 
+concurrency:
+  group: deploy-web
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: Build and deploy web container
@@ -40,7 +44,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "cd /opt/plothole && sudo docker compose up --build -d web"
+            "cd /opt/plothole && sudo docker compose rm -f web; sudo docker compose up --build --force-recreate -d web"
 
       - name: Clean up SSH key
         if: always()
