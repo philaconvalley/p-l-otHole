@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
           alignItems: "center", zIndex: 1, paddingTop: 24,
         }}>
           <div style={{ fontSize: 13, color: "#4b5563", fontStyle: "italic" }}>
-            "Map it. Name it. Shame it. Fix it."
+            &ldquo;Map it. Name it. Shame it. Fix it.&rdquo;
           </div>
           <div style={{ fontSize: 13, color: "#4b5563" }}>#PlotHole · #PhillyRoads</div>
         </div>
