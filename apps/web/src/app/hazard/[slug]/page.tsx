@@ -1,14 +1,14 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import { db } from "@/lib/db";
 import { SeverityBadge, StatusBadge } from "@/components/severity-badge";
 import { StatBox } from "@/components/stat-box";
 import { VoteSection } from "./vote-section";
 import { statusLabel, typeLabel } from "@/lib/format";
 
-const HazardMiniMap = dynamic(
+const HazardMiniMap = nextDynamic(
   () => import("./hazard-mini-map").then(m => m.HazardMiniMap),
   { ssr: false, loading: () => <div className="w-full h-full bg-[#1a1a1a]" /> }
 );
