@@ -94,7 +94,7 @@ export default async function HazardDetailPage({
 
           {/* Vote velocity */}
           <div className="bg-[#222] border border-[#333] rounded-lg p-4">
-            <div className="flex items-center gap-2 text-[#e5521e] font-semibold">
+            <div className="flex items-center gap-2 text-[#F99300] font-semibold">
               <span className="text-lg">↑</span>
               <span>{hazard.upvotes > 50 ? "Accelerating" : hazard.upvotes > 10 ? "Active" : "Low"}</span>
             </div>
@@ -111,7 +111,7 @@ export default async function HazardDetailPage({
                 return (
                   <div key={step.key} className="flex items-center flex-1">
                     <div className={`flex-1 py-1 text-[10px] font-medium rounded text-center
-                      ${isActive ? "bg-[#e5521e]/20 text-[#e5521e] border border-[#e5521e]/30"
+                      ${isActive ? "bg-[#F99300]/20 text-[#F99300] border border-[#F99300]/30"
                         : isDone  ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
                         : "bg-[#222] text-[#6b7280] border border-[#333]"}`}>
                       {step.label}
@@ -174,7 +174,7 @@ export default async function HazardDetailPage({
               )}
             </div>
             <div className="bg-[#1a1a1a] map-grid border border-[#333] rounded-xl h-56 relative overflow-hidden">
-              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#e5521e] ring-2 ring-[#e5521e]/30" />
+              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#F99300] ring-2 ring-[#F99300]/30" />
               {hazard.latitude && hazard.longitude && (
                 <p className="absolute bottom-2 left-0 right-0 text-center text-[9px] text-[#6b7280] font-mono">
                   {Number(hazard.latitude).toFixed(4)}°N {Math.abs(Number(hazard.longitude)).toFixed(4)}°W
@@ -225,7 +225,7 @@ export default async function HazardDetailPage({
             <div className="space-y-4">
               <div className="bg-[#222] border border-[#333] rounded-xl p-5">
                 <p className="text-sm font-semibold text-[#f5f5f5] mb-1">Community name</p>
-                <p className="text-base font-bold text-[#e5521e] mb-1">&ldquo;{hazard.name}&rdquo;</p>
+                <p className="text-base font-bold text-[#F99300] mb-1">&ldquo;{hazard.name}&rdquo;</p>
                 <p className="text-xs text-[#6b7280] mb-3">{hazard.upvotes} votes</p>
                 <input type="text" placeholder="Propose a different name..." className="w-full text-sm" />
               </div>
@@ -250,7 +250,7 @@ export default async function HazardDetailPage({
             {slaExceededBy > 0 && (
               <div className="text-xs text-[#9ca3af] mb-3">SLA exceeded by {slaExceededBy} days</div>
             )}
-            <button className="text-sm text-[#e5521e] hover:text-[#f97316] font-medium underline decoration-dotted">
+            <button className="text-sm text-[#F99300] hover:text-[#f97316] font-medium underline decoration-dotted">
               Share to increase pressure 🔥
             </button>
           </div>
@@ -266,9 +266,9 @@ function TimelineItem({
   return (
     <div className="flex items-start gap-3">
       <div className={`w-2.5 h-2.5 rounded-full mt-0.5 flex-shrink-0
-        ${active ? "bg-[#e5521e]" : done ? "bg-emerald-500" : "bg-[#333]"}`} />
+        ${active ? "bg-[#F99300]" : done ? "bg-emerald-500" : "bg-[#333]"}`} />
       <div>
-        <p className={`text-sm font-medium ${active ? "text-[#e5521e]" : done ? "text-[#f5f5f5]" : "text-[#4b5563]"}`}>
+        <p className={`text-sm font-medium ${active ? "text-[#F99300]" : done ? "text-[#f5f5f5]" : "text-[#4b5563]"}`}>
           {label}
         </p>
         {date && <p className="text-xs text-[#6b7280] mt-0.5">{date}</p>}

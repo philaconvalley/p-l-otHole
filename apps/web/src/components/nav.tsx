@@ -42,7 +42,7 @@ export function Nav() {
                 after:h-0.5 after:rounded-full after:transition-all after:duration-150
                 ${
                   isActive
-                    ? "text-white after:bg-[#e5521e]"
+                    ? "text-white after:bg-[#F99300]"
                     : "text-[#9ca3af] hover:text-white after:bg-transparent"
                 }
               `}
@@ -82,7 +82,7 @@ export function Nav() {
         <Link
           href="/report/new"
           className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-semibold
-                     text-white bg-[#e5521e] rounded-full hover:bg-[#cc4418]
+                     text-white bg-[#F99300] rounded-full hover:bg-[#e07e00]
                      transition-colors duration-150"
         >
           <span>+</span>

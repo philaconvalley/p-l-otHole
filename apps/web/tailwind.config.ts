@@ -6,7 +6,7 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          orange: "#e5521e",
+          orange: "#F99300",
           "orange-hover": "#cc4418",
         },
         surface: {

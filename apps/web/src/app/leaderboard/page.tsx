@@ -35,7 +35,7 @@ export default async function LeaderboardPage() {
           <div className="flex gap-2">
             {["This month", "All time"].map((t, i) => (
               <button key={t} className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors
-                ${i === 1 ? "bg-[#e5521e] text-white border-[#e5521e]" : "text-[#9ca3af] border-[#444] hover:border-[#888]"}`}>
+                ${i === 1 ? "bg-[#F99300] text-white border-[#F99300]" : "text-[#9ca3af] border-[#444] hover:border-[#888]"}`}>
                 {t}
               </button>
             ))}
@@ -57,7 +57,7 @@ export default async function LeaderboardPage() {
                   </span>
                   <div className="flex-1 min-w-0">
                     <a href={`/profile/${user.username}`}
-                       className="text-sm font-medium text-[#f5f5f5] hover:text-[#e5521e] transition-colors">
+                       className="text-sm font-medium text-[#f5f5f5] hover:text-[#F99300] transition-colors">
                       @{user.username}
                     </a>
                     <p className="text-[10px] text-[#4b5563]">{RANK_LABELS[i] ?? "Newcomer"}</p>
@@ -100,9 +100,9 @@ export default async function LeaderboardPage() {
               <div className="bg-[#1e1e1e] border border-[#2a2a2a] rounded-xl p-5">
                 <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-widest mb-3">Top contributor</p>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#e5521e]/15 border border-[#e5521e]/30
+                  <div className="w-12 h-12 rounded-full bg-[#F99300]/15 border border-[#F99300]/30
                                   flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-bold text-[#e5521e]">#1</span>
+                    <span className="text-sm font-bold text-[#F99300]">#1</span>
                   </div>
                   <div>
                     <p className="text-sm font-bold text-[#f5f5f5]">@{users[0].username}</p>

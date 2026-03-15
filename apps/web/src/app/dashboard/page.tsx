@@ -44,12 +44,12 @@ export default async function DashboardPage() {
     label: statusLabel(key),
     count: statusRows.find(r => r.repairStatus === key)?._count._all ?? 0,
     cls:
-      key === "reported"     ? "bg-[#e5521e]" :
+      key === "reported"     ? "bg-[#F99300]" :
       key === "acknowledged" ? "bg-[#f97316]" :
       key === "scheduled"    ? "bg-[#d97706]" :
       key === "in_progress"  ? "bg-[#2563eb]" : "bg-[#10b981]",
     badgeCls:
-      key === "reported"     ? "bg-[#e5521e]/15 text-[#e5521e] border-[#e5521e]/30" :
+      key === "reported"     ? "bg-[#F99300]/15 text-[#F99300] border-[#F99300]/30" :
       key === "acknowledged" ? "bg-orange-500/15 text-orange-400 border-orange-500/30" :
       key === "scheduled"    ? "bg-amber-600/15 text-amber-400 border-amber-600/30" :
       key === "in_progress"  ? "bg-blue-600/15 text-blue-400 border-blue-600/30" :
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
             <p className="text-sm text-[#6b7280] mt-1">Live from database</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="px-4 py-2 text-sm font-semibold text-white bg-[#e5521e] rounded-lg hover:bg-[#cc4418] transition-colors">
+            <button className="px-4 py-2 text-sm font-semibold text-white bg-[#F99300] rounded-lg hover:bg-[#e07e00] transition-colors">
               Generate pressure card
             </button>
           </div>
@@ -111,7 +111,7 @@ export default async function DashboardPage() {
               {topHazards.map((h, i) => (
                 <div key={h.id} className="flex items-center gap-3">
                   <span className="text-xs text-[#6b7280] font-mono w-4">{i + 1}</span>
-                  <a href={"/hazard/" + h.slug} className="flex-1 text-xs text-[#f5f5f5] hover:text-[#e5521e] truncate">
+                  <a href={"/hazard/" + h.slug} className="flex-1 text-xs text-[#f5f5f5] hover:text-[#F99300] truncate">
                     {h.name}
                   </a>
                   <SeverityBadge severity={severityLabel(h.severityScore, h.upvotes)} />
@@ -136,13 +136,13 @@ export default async function DashboardPage() {
               return (
                 <div key={h.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[#2a2a2a] transition-colors">
                   <span className="text-sm font-mono text-[#6b7280] w-5">{i + 1}</span>
-                  <a href={"/hazard/" + h.slug} className="flex-1 text-sm font-medium text-[#f5f5f5] hover:text-[#e5521e]">
+                  <a href={"/hazard/" + h.slug} className="flex-1 text-sm font-medium text-[#f5f5f5] hover:text-[#F99300]">
                     {h.name}
                   </a>
                   <SeverityBadge severity={severityLabel(h.severityScore, h.upvotes)} />
                   <span className="text-xs text-[#9ca3af] font-mono w-16 text-right">{h.upvotes} votes</span>
                   <span className="text-xs text-[#6b7280] font-mono w-20 text-right">{daysOpen} days old</span>
-                  <a href={"/hazard/" + h.slug} className="text-xs text-[#e5521e] hover:text-[#f97316] font-medium">View →</a>
+                  <a href={"/hazard/" + h.slug} className="text-xs text-[#F99300] hover:text-[#f97316] font-medium">View →</a>
                 </div>
               );
             })}

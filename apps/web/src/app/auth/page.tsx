@@ -105,7 +105,7 @@ export default function AuthPage() {
         <div className="w-full h-32 bg-[#1a1a1a] map-grid rounded-xl border border-[#2a2a2a] mb-6
                         flex items-center justify-center relative overflow-hidden">
           {/* Fake markers */}
-          <div className="absolute top-[30%] left-[40%] w-2.5 h-2.5 rounded-full bg-[#e5521e] ring-2 ring-[#e5521e]/30" />
+          <div className="absolute top-[30%] left-[40%] w-2.5 h-2.5 rounded-full bg-[#F99300] ring-2 ring-[#F99300]/30" />
           <div className="absolute top-[55%] left-[60%] w-2 h-2 rounded-full bg-[#f97316] ring-2 ring-[#f97316]/30" />
           <div className="absolute top-[45%] left-[25%] w-2 h-2 rounded-full bg-[#d97706] ring-2 ring-[#d97706]/30" />
           <div className="absolute top-[65%] left-[70%] w-2 h-2 rounded-full bg-[#6b7280]" />
@@ -181,7 +181,7 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-2.5 text-sm font-semibold text-white bg-[#e5521e] rounded-lg hover:bg-[#cc4418] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-2.5 text-sm font-semibold text-white bg-[#F99300] rounded-lg hover:bg-[#e07e00] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading
               ? mode === "signup"

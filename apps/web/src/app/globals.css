@@ -41,14 +41,42 @@
 
   /* Focus ring */
   :focus-visible {
-    @apply outline-none ring-2 ring-[#e5521e] ring-offset-2 ring-offset-[#171717];
+    @apply outline-none ring-2 ring-[#F99300] ring-offset-2 ring-offset-[#171717];
   }
 
   input, textarea, select {
     @apply bg-[#222222] text-[#f5f5f5] border border-[#333333] rounded-lg px-3 py-2
-           placeholder-[#4b5563] focus:outline-none focus:border-[#e5521e]
+           placeholder-[#4b5563] focus:outline-none focus:border-[#F99300]
            transition-colors duration-150;
   }
+}
+
+/* Mapbox popup overrides */
+.plothole-popup .mapboxgl-popup-content {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.plothole-popup .mapboxgl-popup-tip {
+  display: none !important;
+}
+.mapboxgl-ctrl-group {
+  background: #222 !important;
+  border: 1px solid #444 !important;
+}
+.mapboxgl-ctrl-group button {
+  background: #222 !important;
+  color: #f5f5f5 !important;
+}
+.mapboxgl-ctrl-group button:hover {
+  background: #2a2a2a !important;
+}
+.mapboxgl-ctrl-group button + button {
+  border-top: 1px solid #333 !important;
+}
+.mapboxgl-ctrl-icon {
+  filter: invert(1) !important;
 }
 
 @layer utilities {

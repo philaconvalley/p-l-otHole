@@ -34,7 +34,7 @@ export function HazardCard({
         <SeverityBadge severity={severity} className="flex-shrink-0 mt-0.5" />
       </div>
       <div className="flex items-center gap-3 text-xs text-[#9ca3af]">
-        <span className="flex items-center gap-1 text-[#e5521e] font-medium">
+        <span className="flex items-center gap-1 text-[#F99300] font-medium">
           <ClockIcon />
           {daysOpen} days open
         </span>

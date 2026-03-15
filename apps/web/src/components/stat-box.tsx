@@ -12,7 +12,7 @@ export function StatBox({ value, label, accent = false, className = "" }: StatBo
     >
       <span
         className={`font-mono text-3xl font-bold leading-none tabular-nums ${
-          accent ? "text-[#e5521e]" : "text-[#f5f5f5]"
+          accent ? "text-[#F99300]" : "text-[#f5f5f5]"
         }`}
       >
         {value}
