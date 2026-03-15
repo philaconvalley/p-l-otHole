@@ -21,6 +21,10 @@ export const metadata: Metadata = {
   title: "P(l)otHole — Map it. Name it. Shame it. Fix it.",
   description:
     "Community-driven civic platform for reporting, tracking, and pressuring the repair of road hazards.",
+  icons: {
+    icon: "/plothole-favicon.png",
+    apple: "/plothole-favicon.png",
+  },
   openGraph: {
     title: "P(l)otHole",
     description: "Map it. Name it. Shame it. Fix it.",
