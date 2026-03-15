@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Route } from "next";
 
 const NAV_LINKS = [
   { href: "/", label: "Map" },
@@ -36,7 +37,7 @@ export function Nav() {
           return (
             <Link
               key={link.href}
-              href={link.href}
+              href={link.href as Route}
               className={`
                 px-3 py-1 text-sm font-medium rounded-md transition-colors duration-150
                 relative after:absolute after:bottom-0 after:left-3 after:right-3
