@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import { StatBox } from "@/components/stat-box";
 import { SeverityBadge } from "@/components/severity-badge";
+import { PressureCardButton } from "@/components/pressure-card-modal";
 import { db } from "@/lib/db";
 import { statusLabel, severityLabel } from "@/lib/format";
 
@@ -73,9 +74,7 @@ export default async function DashboardPage() {
             <p className="text-sm text-[#6b7280] mt-1">Live from database</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="px-4 py-2 text-sm font-semibold text-white bg-[#F99300] rounded-lg hover:bg-[#e07e00] transition-colors">
-              Generate pressure card
-            </button>
+            <PressureCardButton open={open} critical={critical} avgDays={avgDaysOpen} />
           </div>
         </div>
 
