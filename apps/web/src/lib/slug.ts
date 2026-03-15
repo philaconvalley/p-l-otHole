@@ -37,7 +37,7 @@ export async function generateUniqueSlug(name: string): Promise<string> {
     if (!h.slug) continue;
     const match = h.slug.match(new RegExp(`^${baseSlug}-(\\d+)$`));
     if (match) {
-      const num = parseInt(match[1], 10);
+      const num = parseInt(match[1] ?? "0", 10);
       if (num > maxNum) maxNum = num;
     }
   }
