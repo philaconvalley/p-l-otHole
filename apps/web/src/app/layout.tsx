@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, DM_Mono } from "next/font/google";
 import { Nav } from "@/components/nav";
+import { Providers } from "@/components/providers";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -35,8 +36,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} ${dmMono.variable}`}>
       <body className="bg-[#171717] text-[#f5f5f5] antialiased font-sans">
-        <Nav />
-        <div className="pt-14">{children}</div>
+        <Providers>
+          <Nav />
+          <div className="pt-14">{children}</div>
+        </Providers>
       </body>
     </html>
   );

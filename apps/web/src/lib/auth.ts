@@ -1,3 +1,5 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "./auth-options";
 import { db } from "./db";
 
 // Session user type
@@ -10,13 +12,11 @@ export interface SessionUser {
 
 /**
  * Get the current authenticated user from the session.
- *
- * TODO: Replace with NextAuth.js session when configured.
- * For now, this checks for a dev header or returns null.
+ * Works with both App Router (no request needed) and Route Handlers (with request).
  */
-export async function getSession(request: Request): Promise<SessionUser | null> {
+export async function getSession(request?: Request): Promise<SessionUser | null> {
   // Development: allow passing user ID via header for testing
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === "development" && request) {
     const devUserId = request.headers.get("x-dev-user-id");
     if (devUserId) {
       const user = await db.user.findUnique({
@@ -32,19 +32,31 @@ export async function getSession(request: Request): Promise<SessionUser | null> 
     }
   }
 
-  // TODO: Implement NextAuth.js session retrieval
-  // const session = await getServerSession(authOptions);
-  // if (!session?.user?.id) return null;
-  // return db.user.findUnique({ where: { id: session.user.id } });
+  const session = await getServerSession(authOptions);
 
-  return null;
+  if (!session?.user?.id) {
+    return null;
+  }
+
+  // Fetch full user data from database
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      isModerator: true,
+    },
+  });
+
+  return user;
 }
 
 /**
  * Require authentication - throws if not authenticated.
  * Returns the session user if authenticated.
  */
-export async function requireAuth(request: Request): Promise<SessionUser> {
+export async function requireAuth(request?: Request): Promise<SessionUser> {
   const session = await getSession(request);
   if (!session) {
     throw new AuthError("Authentication required");

@@ -1,7 +1,95 @@
+"use client";
+
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
+type AuthMode = "login" | "signup";
+
 export default function AuthPage() {
+  const router = useRouter();
+  const [mode, setMode] = useState<AuthMode>("login");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Form fields
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      if (mode === "signup") {
+        // Sign up first
+        const res = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, username }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.error?.message || "Failed to create account");
+          setIsLoading(false);
+          return;
+        }
+
+        // Auto sign-in after successful signup
+        const signInResult = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        });
+
+        if (signInResult?.error) {
+          setError("Account created but failed to sign in. Please try logging in.");
+          setMode("login");
+          setIsLoading(false);
+          return;
+        }
+
+        router.push("/");
+        router.refresh();
+      } else {
+        // Login
+        const result = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        });
+
+        if (result?.error) {
+          // Handle specific error messages from auth
+          if (result.error === "Account is banned") {
+            setError("Your account has been suspended. Contact support for assistance.");
+          } else {
+            setError("Invalid email or password");
+          }
+          setIsLoading(false);
+          return;
+        }
+
+        router.push("/");
+        router.refresh();
+      }
+    } catch {
+      setError("An unexpected error occurred");
+      setIsLoading(false);
+    }
+  }
+
+  function toggleMode() {
+    setMode(mode === "login" ? "signup" : "login");
+    setError(null);
+  }
+
   return (
     <div className="min-h-[calc(100vh-56px)] bg-[#171717] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
@@ -25,29 +113,92 @@ export default function AuthPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-[#222] border border-[#333] rounded-xl p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-[#222] border border-[#333] rounded-xl p-6 space-y-4">
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-3 py-2 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {mode === "signup" && (
+            <div>
+              <label htmlFor="username" className="block text-xs text-[#9ca3af] mb-1.5">
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="roadwarrior42"
+                required
+                minLength={3}
+                maxLength={40}
+                className="w-full"
+                disabled={isLoading}
+              />
+            </div>
+          )}
+
           <div>
-            <label className="block text-xs text-[#9ca3af] mb-1.5">Email</label>
+            <label htmlFor="email" className="block text-xs text-[#9ca3af] mb-1.5">
+              Email
+            </label>
             <input
+              id="email"
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
+              required
               className="w-full"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-[#9ca3af] mb-1.5">Password</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              className="w-full"
+              disabled={isLoading}
             />
           </div>
 
-          <button className="w-full py-2.5 text-sm font-semibold text-white bg-[#e5521e] rounded-lg hover:bg-[#cc4418] transition-colors">
-            Create account
+          <div>
+            <label htmlFor="password" className="block text-xs text-[#9ca3af] mb-1.5">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              minLength={8}
+              className="w-full"
+              disabled={isLoading}
+            />
+            {mode === "signup" && (
+              <p className="text-xs text-[#6b7280] mt-1.5">
+                8+ characters with uppercase, lowercase, and number
+              </p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-2.5 text-sm font-semibold text-white bg-[#e5521e] rounded-lg hover:bg-[#cc4418] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading
+              ? mode === "signup"
+                ? "Creating account..."
+                : "Signing in..."
+              : mode === "signup"
+                ? "Create account"
+                : "Sign in"}
           </button>
-          <button className="w-full py-2.5 text-sm font-medium text-[#f5f5f5] bg-[#2a2a2a] border border-[#444] rounded-lg hover:border-[#888] transition-colors">
-            Log in
+
+          <button
+            type="button"
+            onClick={toggleMode}
+            disabled={isLoading}
+            className="w-full py-2.5 text-sm font-medium text-[#f5f5f5] bg-[#2a2a2a] border border-[#444] rounded-lg hover:border-[#888] transition-colors disabled:opacity-50"
+          >
+            {mode === "signup" ? "Already have an account? Log in" : "Need an account? Sign up"}
           </button>
 
           <div className="flex items-center gap-3">
@@ -59,7 +210,7 @@ export default function AuthPage() {
           <Link href="/" className="block w-full py-2.5 text-sm font-medium text-[#9ca3af] hover:text-white transition-colors text-center">
             Browse map as guest →
           </Link>
-        </div>
+        </form>
       </div>
     </div>
   );
