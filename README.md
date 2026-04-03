@@ -223,13 +223,17 @@ The app will be available at `http://localhost:3000`. The API runs on `http://lo
 
 ## Contributing
 
-We welcome contributions of all kinds -- bug reports, feature requests, documentation improvements, and code. Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
+We welcome contributions of all kinds and all skill levels -- bug reports, feature requests, documentation improvements, and code. **No coding experience required** — writing issue reports, testing UX flows, improving docs, and creating seed data are all valuable contributions. Look for issues labeled `good first issue` to get started.
+
+Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 
 - Issue and pull request workflow
 - Branch naming and commit message conventions
 - Local development setup
 - Testing expectations
 - Code review process
+
+All participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
