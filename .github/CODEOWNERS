@@ -1,0 +1,11 @@
+# Default owners for everything in the repo
+* @philaconvalley/maintainers
+
+# Application code
+/apps/ @philaconvalley/maintainers
+
+# Shared packages
+/packages/ @philaconvalley/maintainers
+
+# CI/CD and config changes need maintainer review
+/.github/ @philaconvalley/maintainers

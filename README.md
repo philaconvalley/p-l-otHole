@@ -1,5 +1,9 @@
 # P(l)otHole
 
+![License: ODbL](https://img.shields.io/badge/license-ODbL-blue)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
+![Good First Issues](https://img.shields.io/github/issues/philaconvalley/p-l-otHole/good%20first%20issue?color=7057ff&label=good%20first%20issues)
+
 **Map it. Name it. Shame it. Fix it.**
 
 P(l)otHole is a community-driven civic platform that empowers residents to report, track, and pressure-fix road hazards in their neighborhoods. Think of it as a public ledger for every pothole, crack, and sinkhole -- complete with crowd-sourced names, severity scores, and a built-in shame clock counting the days your city has ignored them.
