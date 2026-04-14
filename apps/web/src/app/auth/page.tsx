@@ -96,7 +96,7 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-56px)] bg-[#171717] flex items-center justify-center p-4">
+    <div className="min-h-viewport-minus-nav bg-[#171717] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">

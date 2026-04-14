@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit, DM_Mono } from "next/font/google";
 import { Nav } from "@/components/nav";
 import { Providers } from "@/components/providers";
@@ -30,6 +30,13 @@ export const metadata: Metadata = {
     description: "Map it. Name it. Shame it. Fix it.",
     type: "website",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

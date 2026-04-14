@@ -75,7 +75,7 @@ export default async function ProfilePage({
   const initials    = displayName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
   return (
-    <div className="min-h-[calc(100vh-56px)] bg-[#171717] p-6">
+    <div className="min-h-viewport-minus-nav bg-[#171717] p-6">
       <div className="max-w-4xl mx-auto flex flex-col md:flex-row gap-6">
 
         {/* ── Left sidebar ───────────────────────────────── */}

@@ -28,7 +28,7 @@ export default async function AdminPage() {
   const pendingCount = pending.length;
 
   return (
-    <div className="min-h-[calc(100vh-56px)] bg-[#171717] flex">
+    <div className="min-h-viewport-minus-nav bg-[#171717] flex">
 
       {/* ── Sidebar ─────────────────────────────────────── */}
       <aside className="w-56 flex-shrink-0 bg-[#1e1e1e] border-r border-[#2a2a2a] p-3">

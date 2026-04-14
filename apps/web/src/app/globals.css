@@ -80,6 +80,26 @@
 }
 
 @layer utilities {
+  /* Full-height minus nav (56px): 100vh for older browsers, 100dvh when supported */
+  .min-h-viewport-minus-nav {
+    min-height: calc(100vh - 56px);
+    min-height: calc(100dvh - 56px);
+  }
+
+  /* Map page: prefer dynamic viewport on mobile; fall back to 100vh */
+  .map-page-shell {
+    height: calc(100vh - 56px);
+    height: calc(100dvh - 56px);
+  }
+
+  /* Mobile hazard list sheet on map page */
+  .mobile-hazard-sheet {
+    max-height: min(78vh, 100%);
+    max-height: min(78dvh, 100%);
+    min-height: 36vh;
+    min-height: 36dvh;
+  }
+
   .map-grid {
     background-image:
       linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),

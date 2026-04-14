@@ -55,7 +55,7 @@ export default async function HazardDetailPage({
     .join(" ");
 
   return (
-    <div className="min-h-[calc(100vh-56px)] bg-[#171717]">
+    <div className="min-h-viewport-minus-nav bg-[#171717]">
       <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8">
 
         {/* ── Left sidebar ─────────────────────────────────── */}
@@ -169,8 +169,8 @@ export default async function HazardDetailPage({
         {/* ── Main content ───────────────────────────────────── */}
         <main className="flex-1 space-y-6">
           {/* Photo + mini-map */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2 bg-[#222] border border-[#333] rounded-xl h-56 flex items-center justify-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-2 bg-[#222] border border-[#333] rounded-xl h-56 flex items-center justify-center">
               {Array.isArray(hazard.images) && hazard.images.length > 0 ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={String(hazard.images[0])} alt={hazard.name ?? ""} className="w-full h-full object-cover rounded-xl" />
@@ -226,7 +226,7 @@ export default async function HazardDetailPage({
           </div>
 
           {/* Vote + Community name */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <VoteSection
               hazardId={hazard.id}
               upvotes={hazard.upvotes}

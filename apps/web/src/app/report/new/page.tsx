@@ -131,7 +131,7 @@ export default function ReportPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-56px)] bg-[#171717]" onSubmit={handleSubmit}>
+    <div className="min-h-viewport-minus-nav bg-[#171717]" onSubmit={handleSubmit}>
       {/* Progress bar */}
       <div className="border-b border-[#2a2a2a] bg-[#171717]">
         <div className="max-w-4xl mx-auto px-6 py-4">
@@ -277,7 +277,7 @@ export default function ReportPage() {
               <label className="block text-sm text-[#9ca3af] mb-2">
                 Hazard type <span className="text-[#F99300]">*</span>
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {HAZARD_TYPES.map((type) => (
                   <button
                     key={type}

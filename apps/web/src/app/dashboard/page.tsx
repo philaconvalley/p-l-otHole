@@ -65,7 +65,7 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <div className="min-h-[calc(100vh-56px)] bg-[#171717] p-6">
+    <div className="min-h-viewport-minus-nav bg-[#171717] p-6">
       <div className="max-w-5xl mx-auto space-y-6">
 
         <div className="flex items-start justify-between">
